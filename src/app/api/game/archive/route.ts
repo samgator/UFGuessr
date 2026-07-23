@@ -5,9 +5,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // 1. Fetch all active locations
+    // 1. Fetch all active locations that are NOT in the daily queue
     const allLocations = await prisma.location.findMany({
-      where: { approved: true },
+      where: {
+        approved: true,
+        dailyQueues: {
+          none: {}, // Excludes any location that is scheduled in the daily queue
+        },
+      },
     });
 
     if (allLocations.length === 0) {

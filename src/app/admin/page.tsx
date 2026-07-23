@@ -79,6 +79,11 @@ export default function AdminPage() {
   const [queueError, setQueueError] = useState("");
   const [queueSubmitting, setQueueSubmitting] = useState(false);
 
+  // Append Queue State
+  const [appendSubmitting, setAppendSubmitting] = useState(false);
+  const [appendMessage, setAppendMessage] = useState("");
+  const [appendError, setAppendError] = useState("");
+
   // Settings State
   const [settingsSaving, setSettingsSubmitting] = useState(false);
 
@@ -363,6 +368,31 @@ export default function AdminPage() {
     }
   };
 
+  // Append All Active Unscheduled Locations to Daily Queue
+  const handleAppendQueue = async () => {
+    setAppendError("");
+    setAppendMessage("");
+    setAppendSubmitting(true);
+
+    try {
+      const res = await fetch("/api/admin/queue/append", {
+        method: "POST",
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setAppendMessage(data.message);
+        await loadDashboardData();
+      } else {
+        setAppendError(data.error || "Failed to append locations");
+      }
+    } catch {
+      setAppendError("Server communication error");
+    } finally {
+      setAppendSubmitting(false);
+    }
+  };
+
   // Update Settings (Toggles)
   const handleSettingToggle = async (key: string, currentValue: string) => {
     setSettingsSubmitting(true);
@@ -609,56 +639,88 @@ export default function AdminPage() {
       {/* TAB CONTENT: DAILY CALENDAR QUEUE */}
       {activeTab === "queue" && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Scheduling Form */}
-          <div className="glass-card p-5 rounded-2xl h-fit border border-white/10 shadow-lg flex flex-col gap-4">
-            <h2 className="font-extrabold text-lg flex items-center gap-1.5">
-              <Calendar className="h-5 w-5 text-blue-500" /> Schedule Landmark
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">Assign locations to future dates</p>
+          {/* Scheduling Column */}
+          <div className="flex flex-col gap-5">
+            {/* Scheduling Form */}
+            <div className="glass-card p-5 rounded-2xl h-fit border border-white/10 shadow-lg flex flex-col gap-4">
+              <h2 className="font-extrabold text-lg flex items-center gap-1.5">
+                <Calendar className="h-5 w-5 text-blue-500" /> Schedule Landmark
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">Assign locations to future dates</p>
 
-            <form onSubmit={handleQueueSubmit} className="flex flex-col gap-3 border-t border-white/5 pt-3">
-              {queueError && (
-                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
-                  {queueError}
+              <form onSubmit={handleQueueSubmit} className="flex flex-col gap-3 border-t border-white/5 pt-3">
+                {queueError && (
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
+                    {queueError}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Select Landmark</label>
+                  <select
+                    required
+                    value={queueLocationId}
+                    onChange={(e) => setQueueLocationId(e.target.value)}
+                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                  >
+                    <option value="">-- Choose location --</option>
+                    {locations.map((loc) => (
+                      <option key={loc.id} value={loc.id}>
+                        {loc.name} ({loc.difficulty})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date</label>
+                  <input
+                    type="date"
+                    required
+                    value={queueDate}
+                    onChange={(e) => setQueueDate(e.target.value)}
+                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={queueSubmitting}
+                  className="w-full mt-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+                >
+                  {queueSubmitting ? "Scheduling..." : "Schedule Slot"}
+                </button>
+              </form>
+            </div>
+
+            {/* Quick Actions / Auto-Append */}
+            <div className="glass-card p-5 rounded-2xl h-fit border border-white/10 shadow-lg flex flex-col gap-3">
+              <h2 className="font-extrabold text-lg flex items-center gap-1.5">
+                <Plus className="h-5 w-5 text-orange-500" /> Quick Actions
+              </h2>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 -mt-2 leading-relaxed">
+                Automatically schedule all approved locations that are not already in the daily calendar to consecutive future slots.
+              </p>
+
+              {appendMessage && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[11px] font-semibold">
+                  {appendMessage}
+                </div>
+              )}
+              {appendError && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[11px] font-semibold">
+                  {appendError}
                 </div>
               )}
 
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Select Landmark</label>
-                <select
-                  required
-                  value={queueLocationId}
-                  onChange={(e) => setQueueLocationId(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                >
-                  <option value="">-- Choose location --</option>
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>
-                      {loc.name} ({loc.difficulty})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date</label>
-                <input
-                  type="date"
-                  required
-                  value={queueDate}
-                  onChange={(e) => setQueueDate(e.target.value)}
-                  className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                />
-              </div>
-
               <button
-                type="submit"
-                disabled={queueSubmitting}
-                className="w-full mt-2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+                onClick={handleAppendQueue}
+                disabled={appendSubmitting}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95 flex items-center justify-center gap-1.5"
               >
-                {queueSubmitting ? "Scheduling..." : "Schedule Slot"}
+                {appendSubmitting ? "Appending..." : "Auto-Append Active Locations"}
               </button>
-            </form>
+            </div>
           </div>
 
           {/* Scheduled Calendar List */}

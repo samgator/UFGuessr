@@ -6,8 +6,44 @@ export const dynamic = "force-dynamic";
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
+// Anti-abuse controls to prevent database flooding
+const rateLimitMap = new Map<string, number[]>();
+const MAX_SUBMISSIONS_PER_HOUR = 3;
+const MAX_PENDING_QUEUE_SIZE = 50;
+
 export async function POST(req: NextRequest) {
   try {
+    // 1. IP Rate Limiting (Prevents rapid script loops)
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("x-real-ip") || "127.0.0.1";
+    const now = Date.now();
+    const oneHourAgo = now - 60 * 60 * 1000;
+
+    const clientHistory = rateLimitMap.get(clientIp) || [];
+    const recentSubmissions = clientHistory.filter(time => time > oneHourAgo);
+
+    if (recentSubmissions.length >= MAX_SUBMISSIONS_PER_HOUR) {
+      return NextResponse.json(
+        { error: "You have reached the limit of 3 submissions per hour. Please try again later." },
+        { status: 429 }
+      );
+    }
+
+    // 2. Global Pending Queue Cap (Guarantees database storage safety)
+    const pendingCount = await prisma.location.count({
+      where: { approved: false },
+    });
+
+    if (pendingCount >= MAX_PENDING_QUEUE_SIZE) {
+      return NextResponse.json(
+        { error: "The community submission queue is currently full. Please try again after an admin has reviewed pending submissions." },
+        { status: 429 }
+      );
+    }
+
+    // Update rate limit history
+    recentSubmissions.push(now);
+    rateLimitMap.set(clientIp, recentSubmissions);
+
     const formData = await req.formData();
     const name = formData.get("name")?.toString();
     const latitudeStr = formData.get("latitude")?.toString();
