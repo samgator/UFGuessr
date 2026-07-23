@@ -26,7 +26,29 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+
+# prisma / sqlite
+/prisma/dev.db
+/prisma/dev.db-journal
+*.db
+*.db-journal
+
+# uploads
+/public/uploads/
+
+# IDEs and editors
+/.idea/
+/.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+Thumbs.db
 
 # vercel
 .vercel

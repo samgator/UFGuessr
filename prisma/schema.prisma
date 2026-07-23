@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+}
+
+model Location {
+  id          Int          @id @default(autoincrement())
+  name        String
+  latitude    Float
+  longitude   Float
+  imageUrl    Bytes
+  difficulty  String
+  approved    Boolean      @default(true)
+  uploader    String?      @default("Anonymous")
+  createdAt   DateTime     @default(now())
+  dailyQueues DailyQueue[]
+}
+
+model DailyQueue {
+  id            Int      @id @default(autoincrement())
+  locationId    Int
+  scheduledDate DateTime @unique
+  createdAt     DateTime @default(now())
+  location      Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id    Int    @id @default(autoincrement())
+  key   String @unique
+  value String
+}
