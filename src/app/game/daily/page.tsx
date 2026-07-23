@@ -263,7 +263,7 @@ export default function DailyGamePage() {
         <div className="w-full h-full relative flex flex-col">
           {/* Small floating header inside map for floating mode */}
           {!splitScreen && !isMapFullscreen && (
-            <div className="absolute top-3 left-3 z-30 glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
+            <div className="absolute top-3 left-3 z-[1002] glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
               <MapPin className="h-3 w-3 text-blue-400" />
               <span>Campus Map</span>
             </div>
@@ -273,14 +273,14 @@ export default function DailyGamePage() {
           {isMapFullscreen ? (
             <button
               onClick={() => setIsMapFullscreen(false)}
-              className="absolute top-4 right-4 z-40 flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-2xl border border-orange-500/20"
+              className="absolute top-4 right-4 z-[1002] flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-2xl border border-orange-500/20"
             >
               <Minimize2 className="h-4 w-4" /> Exit Fullscreen
             </button>
           ) : (
             <button
               onClick={() => setIsMapFullscreen(true)}
-              className="absolute top-3 right-3 z-30 p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg"
+              className="absolute top-3 right-3 z-[1002] p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg"
               title="Fullscreen Map"
             >
               <Maximize2 className="h-3.5 w-3.5" />
