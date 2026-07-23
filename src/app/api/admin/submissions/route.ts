@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeLocation } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(pending);
+    return NextResponse.json(pending.map(serializeLocation));
   } catch (error) {
     console.error("GET admin submissions error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

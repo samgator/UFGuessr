@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeLocation } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +79,7 @@ export async function GET() {
       success: true,
       underConstruction: false,
       date: etDateStr,
-      location: queueItem.location,
+      location: serializeLocation(queueItem.location),
       isFallback,
     });
   } catch (error) {

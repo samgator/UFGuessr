@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle } from "lucide-react";
+import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin } from "lucide-react";
 
 export default function Home() {
   const [dailyStatus, setDailyStatus] = useState<{ underConstruction: boolean; loaded: boolean }>({
@@ -264,10 +263,34 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Footer Branding credits */}
-      <div className="flex flex-col items-center text-center gap-1.5 z-10 text-[10px] text-gray-500 font-bold uppercase tracking-widest border-t border-gray-100 dark:border-white/5 w-full pt-6">
-        <span>UFGuessr is built for fans of the University of Florida</span>
-        <span className="text-gray-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal">Developed by Sam Morsics. All images belong to their respective Creative Commons authors.</span>
+      {/* Footer Branding credits & Social Links */}
+      <div className="flex flex-col items-center text-center gap-4 z-10 border-t border-gray-100 dark:border-white/5 w-full pt-6">
+        {/* Social Links Section */}
+        <div className="flex items-center gap-4">
+          <a
+            href="https://github.com/samgator"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-xs font-bold text-gray-400 hover:text-white transition-all duration-200"
+          >
+            <Github className="h-4 w-4" />
+            <span>GitHub</span>
+          </a>
+          <a
+            href="https://www.linkedin.com/in/samuelmorsics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-xs font-bold text-gray-400 hover:text-blue-400 transition-all duration-200"
+          >
+            <Linkedin className="h-4 w-4" />
+            <span>LinkedIn</span>
+          </a>
+        </div>
+
+        <div className="flex flex-col items-center text-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+          <span>UFGuessr is built for fans of the University of Florida</span>
+          <span className="text-gray-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective Creative Commons authors.</span>
+        </div>
       </div>
 
       {/* USER SUBMISSION MODAL */}

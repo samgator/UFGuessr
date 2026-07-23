@@ -1,32 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeLocation } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-// Utility to delete local image file if it exists
-async function deleteLocalImage(imageUrl: string) {
-  if (imageUrl.startsWith("/api/uploads/") || imageUrl.startsWith("/uploads/")) {
-    const filename = imageUrl.replace("/api/uploads/", "").replace("/uploads/", "");
-    const filePath = path.join(process.cwd(), "uploads", filename);
-    const oldFilePathInPublic = path.join(process.cwd(), "public", "uploads", filename);
-    try {
-      await fs.unlink(filePath);
-      console.log(`Deleted local image file: ${filePath}`);
-    } catch {
-      // Ignore if not found
-    }
-    try {
-      await fs.unlink(oldFilePathInPublic);
-      console.log(`Deleted legacy image file: ${oldFilePathInPublic}`);
-    } catch {
-      // Ignore if not found
-    }
-  }
-}
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -43,7 +20,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Location not found" }, { status: 404 });
     }
 
-    return NextResponse.json(location);
+    return NextResponse.json(serializeLocation(location));
   } catch (error) {
     console.error("GET single location error:", error);
     return NextResponse.json({ error: "Failed to fetch location" }, { status: 500 });
@@ -100,7 +77,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       );
     }
 
-    let imageUrl = existingLocation.imageUrl;
+    const dataToUpdate: {
+      name: string;
+      latitude: number;
+      longitude: number;
+      difficulty: string;
+      imageUrl?: Buffer;
+    } = {
+      name,
+      latitude,
+      longitude,
+      difficulty,
+    };
 
     if (imageFile && imageFile.name) {
       // Validate File Size
@@ -116,49 +104,28 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         );
       }
 
-      // Sanitize Filename
-      const fileExt = path.extname(imageFile.name).toLowerCase() || ".jpg";
-      const cleanName = name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-      const uniqueFilename = `${cleanName}_${Date.now()}${fileExt}`;
-
-      // Ensure upload directory exists
-      const uploadDir = path.join(process.cwd(), "uploads");
-      try {
-        await fs.access(uploadDir);
-      } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
-      }
-
-      // Save File
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const filePath = path.join(uploadDir, uniqueFilename);
-      await fs.writeFile(filePath, buffer);
-
-      // Clean up old image if it was local
-      await deleteLocalImage(existingLocation.imageUrl);
-
-      imageUrl = `/api/uploads/${uniqueFilename}`;
+      // Save File Bytes
+      dataToUpdate.imageUrl = Buffer.from(await imageFile.arrayBuffer());
     } else if (externalImageUrl) {
-      // If updating to an external URL, clean up old local image if applicable
-      if (externalImageUrl !== existingLocation.imageUrl) {
-        await deleteLocalImage(existingLocation.imageUrl);
+      try {
+        const response = await fetch(externalImageUrl);
+        if (!response.ok) {
+          return NextResponse.json({ error: "Failed to fetch external image from URL" }, { status: 400 });
+        }
+        dataToUpdate.imageUrl = Buffer.from(await response.arrayBuffer());
+      } catch (err) {
+        console.error("External image fetch error:", err);
+        return NextResponse.json({ error: "Invalid external image URL or network error" }, { status: 400 });
       }
-      imageUrl = externalImageUrl;
     }
 
     // 4. Update Database
     const updatedLocation = await prisma.location.update({
       where: { id },
-      data: {
-        name,
-        latitude,
-        longitude,
-        imageUrl,
-        difficulty,
-      },
+      data: dataToUpdate,
     });
 
-    return NextResponse.json(updatedLocation);
+    return NextResponse.json(serializeLocation(updatedLocation));
   } catch (error) {
     console.error("Update location error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -185,9 +152,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     if (!location) {
       return NextResponse.json({ error: "Location not found" }, { status: 404 });
     }
-
-    // Clean up local image file if present
-    await deleteLocalImage(location.imageUrl);
 
     // Delete DB Record (DailyQueue items will be cascading deleted!)
     await prisma.location.delete({

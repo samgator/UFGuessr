@@ -190,7 +190,7 @@ export default function AdminPage() {
     setFormLatitude(loc.latitude.toString());
     setFormLongitude(loc.longitude.toString());
     setFormImageFile(null);
-    setFormExternalUrl(loc.imageUrl.startsWith("/uploads/") ? "" : loc.imageUrl);
+    setFormExternalUrl((loc.imageUrl.startsWith("/uploads/") || loc.imageUrl.startsWith("/api/uploads/") || loc.imageUrl.startsWith("/api/locations/")) ? "" : loc.imageUrl);
     setFormError("");
     setIsFormOpen(true);
   };

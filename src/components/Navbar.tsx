@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, MapPin, Menu, X } from "lucide-react";
+import { Sun, Moon, MapPin, Menu, X, Coffee } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -81,6 +81,19 @@ export default function Navbar() {
 
       {/* Theme Toggler (Desktop) & Mobile Actions (Mobile) */}
       <div className="flex justify-end items-center gap-3">
+        {/* Desktop Buy Me A Coffee (Square Icon) */}
+        <div className="hidden md:block">
+          <a
+            href="https://www.paypal.com/paypalme/samuelmorsics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2.5 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-yellow-400 flex items-center justify-center p-2"
+            aria-label="Buy Me A Coffee"
+          >
+            <Coffee className="h-5 w-5" />
+          </a>
+        </div>
+
         {/* Desktop Theme Toggler */}
         <div className="hidden md:block">
           <button
@@ -94,6 +107,17 @@ export default function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Buy Me A Coffee (Square Icon) */}
+          <a
+            href="https://www.paypal.com/paypalme/samuelmorsics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-lg glass text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-yellow-400 flex items-center justify-center p-1.5"
+            aria-label="Buy Me A Coffee"
+          >
+            <Coffee className="h-4 w-4" />
+          </a>
+
           <button
             onClick={toggleTheme}
             className="p-1.5 rounded-lg glass text-gray-600 dark:text-gray-300"

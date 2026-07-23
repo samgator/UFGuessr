@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeLocation } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +20,8 @@ export async function GET() {
     // 2. Shuffle locations
     const shuffled = [...allLocations].sort(() => 0.5 - Math.random());
 
-    // 3. Draw 5 locations (or fewer if we have less than 5 total)
-    const gameLocations = shuffled.slice(0, Math.min(5, shuffled.length));
+    // 3. Draw 5 locations (or fewer if we have less than 5 total) and serialize them
+    const gameLocations = shuffled.slice(0, Math.min(5, shuffled.length)).map(serializeLocation);
 
     return NextResponse.json({
       success: true,

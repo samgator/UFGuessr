@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeQueueItem } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 
 export async function GET() {
@@ -13,7 +13,7 @@ export async function GET() {
         scheduledDate: "asc",
       },
     });
-    return NextResponse.json(queue);
+    return NextResponse.json(queue.map(serializeQueueItem));
   } catch (error) {
     console.error("GET queue error:", error);
     return NextResponse.json({ error: "Failed to fetch daily queue" }, { status: 500 });
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, queueItem });
+    return NextResponse.json({ success: true, queueItem: serializeQueueItem(queueItem) });
   } catch (error) {
     console.error("POST queue error:", error);
     return NextResponse.json({ error: "Failed to schedule queue slot" }, { status: 500 });

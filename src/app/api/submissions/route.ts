@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
-import { promises as fs } from "fs";
-import path from "path";
+import { prisma, serializeLocation } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -41,23 +39,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Save image to root uploads directory
-    const fileExt = path.extname(imageFile.name).toLowerCase() || ".jpg";
-    const cleanName = name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-    const uniqueFilename = `pending_${cleanName}_${Date.now()}${fileExt}`;
-
-    const uploadDir = path.join(process.cwd(), "uploads");
-    try {
-      await fs.access(uploadDir);
-    } catch {
-      await fs.mkdir(uploadDir, { recursive: true });
-    }
-
     const buffer = Buffer.from(await imageFile.arrayBuffer());
-    const filePath = path.join(uploadDir, uniqueFilename);
-    await fs.writeFile(filePath, buffer);
-
-    const imageUrl = `/api/uploads/${uniqueFilename}`;
 
     // Save as PENDING location
     const submission = await prisma.location.create({
@@ -65,7 +47,7 @@ export async function POST(req: NextRequest) {
         name,
         latitude,
         longitude,
-        imageUrl,
+        imageUrl: buffer,
         difficulty,
         approved: false,
         uploader,
@@ -75,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Landmark submitted successfully! It is now pending admin review.",
-      submission,
+      submission: serializeLocation(submission),
     });
   } catch (error) {
     console.error("POST submissions error:", error);

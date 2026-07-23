@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, serializeLocation } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
-import { promises as fs } from "fs";
-import path from "path";
 
 // Support file uploads up to 5MB
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -14,7 +12,7 @@ export async function GET() {
       where: { approved: true },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(locations);
+    return NextResponse.json(locations.map(serializeLocation));
   } catch (error) {
     console.error("GET locations error:", error);
     return NextResponse.json({ error: "Failed to fetch locations" }, { status: 500 });
@@ -59,7 +57,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let imageUrl = "";
+    let imageBuffer: Buffer;
 
     if (imageFile && imageFile.name) {
       // Validate File Size
@@ -75,27 +73,19 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Sanitize Filename
-      const fileExt = path.extname(imageFile.name).toLowerCase() || ".jpg";
-      const cleanName = name.replace(/[^a-zA-Z0-9]/g, "_").toLowerCase();
-      const uniqueFilename = `${cleanName}_${Date.now()}${fileExt}`;
-
-      // Ensure upload directory exists
-      const uploadDir = path.join(process.cwd(), "uploads");
-      try {
-        await fs.access(uploadDir);
-      } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
-      }
-
-      // Save File
-      const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const filePath = path.join(uploadDir, uniqueFilename);
-      await fs.writeFile(filePath, buffer);
-
-      imageUrl = `/api/uploads/${uniqueFilename}`;
+      // Read File into Buffer
+      imageBuffer = Buffer.from(await imageFile.arrayBuffer());
     } else if (externalImageUrl) {
-      imageUrl = externalImageUrl;
+      try {
+        const response = await fetch(externalImageUrl);
+        if (!response.ok) {
+          return NextResponse.json({ error: "Failed to fetch external image from URL" }, { status: 400 });
+        }
+        imageBuffer = Buffer.from(await response.arrayBuffer());
+      } catch (err) {
+        console.error("External image fetch error:", err);
+        return NextResponse.json({ error: "Invalid external image URL or network error" }, { status: 400 });
+      }
     } else {
       return NextResponse.json({ error: "An image file or external image URL is required" }, { status: 400 });
     }
@@ -106,12 +96,12 @@ export async function POST(req: NextRequest) {
         name,
         latitude,
         longitude,
-        imageUrl,
+        imageUrl: imageBuffer,
         difficulty,
       },
     });
 
-    return NextResponse.json(newLocation, { status: 201 });
+    return NextResponse.json(serializeLocation(newLocation), { status: 201 });
   } catch (error) {
     console.error("Create location error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
