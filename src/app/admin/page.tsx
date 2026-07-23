@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import DynamicMap from "@/components/DynamicMap";
+import { compressImage } from "@/lib/imageCompression";
 import {
   Lock,
   Plus,
@@ -220,7 +221,9 @@ export default function AdminPage() {
       formData.append("latitude", formLatitude);
       formData.append("longitude", formLongitude);
       if (formImageFile) {
-        formData.append("image", formImageFile);
+        // Compress image client-side to bypass payload size limits
+        const compressedImage = await compressImage(formImageFile);
+        formData.append("image", compressedImage);
       } else if (formExternalUrl) {
         formData.append("externalImageUrl", formExternalUrl);
       }

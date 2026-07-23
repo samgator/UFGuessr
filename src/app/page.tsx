@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import DynamicMap from "@/components/DynamicMap";
 import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin } from "lucide-react";
+import { compressImage } from "@/lib/imageCompression";
 
 export default function Home() {
   const [dailyStatus, setDailyStatus] = useState<{ underConstruction: boolean; loaded: boolean }>({
@@ -42,15 +43,18 @@ export default function Home() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("name", submitName);
-    formData.append("difficulty", submitDifficulty);
-    formData.append("latitude", submitLatitude);
-    formData.append("longitude", submitLongitude);
-    formData.append("image", submitImageFile);
-    formData.append("uploader", submitUploader || "Anonymous");
-
     try {
+      // Compress the image client-side to bypass payload size limits
+      const compressedImage = await compressImage(submitImageFile);
+
+      const formData = new FormData();
+      formData.append("name", submitName);
+      formData.append("difficulty", submitDifficulty);
+      formData.append("latitude", submitLatitude);
+      formData.append("longitude", submitLongitude);
+      formData.append("image", compressedImage);
+      formData.append("uploader", submitUploader || "Anonymous");
+
       const res = await fetch("/api/submissions", {
         method: "POST",
         body: formData,
