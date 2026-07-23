@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🐊 UFGuessr
 
-## Getting Started
+[![Live App](https://img.shields.io/badge/Play%20Live-ufguessr.com-blue?style=for-the-badge&logo=vercel)](https://ufguessr.com)
 
-First, run the development server:
+**UFGuessr** is a geographic exploration game inspired by GeoGuessr, built specifically for fans, students, alumni, and friends of the University of Florida. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Test your knowledge of the historic and beautiful UF campus by guessing where photos and landmarks were taken. Pinpoint your guess on an interactive campus map and earn points based on your accuracy.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Play now at:** [https://ufguessr.com](https://ufguessr.com)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🎮 Game Modes & Features
 
-## Learn More
+### 📅 Daily Challenge Mode
+Test your skills against fellow Gators. Every 24 hours, a synchronized daily location is scheduled. Drop your pin, submit your guess, and share your score on social media to see who knows the campus best!
 
-To learn more about Next.js, take a look at the following resources:
+### 📂 Archive Mode
+Play at your own pace. Explore the archives to discover or revisit iconic landmarks, halls, residence clusters, and secret spots across campus without any daily limits.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🗺️ Custom Interactive Map
+Utilizes high-resolution, lightweight OpenStreetMap data and customized Leaflet interfaces. Pins, distances, and score computations are calculated with precise geographic formulas.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📸 Community Submissions
+Submit your own photos and coordinate pins of favorite spots directly from the homepage. Pending administrator review, your submission might be featured in an upcoming Daily Challenge.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+UFGuessr is designed with cutting-edge web technologies for speed, security, and responsive layouts:
+
+* **Frontend**: React 18, Next.js 14 (App Router), Tailwind CSS, Lucide Icons, Leaflet & React-Leaflet
+* **Backend**: Next.js Serverless API Routes
+* **Database ORM**: Prisma Client
+* **Database**: PostgreSQL (hosted on Supabase)
+
+---
+
+All landmarks and images featured belong to their respective uploaders and Creative Commons authors.
+

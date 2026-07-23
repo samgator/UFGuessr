@@ -148,8 +148,8 @@ export default function DailyGamePage() {
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-extrabold tracking-tight">Daily Game Mode is Locked</h1>
             <p className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
-              Our campus photographers are currently hard at work uploading more high-resolution landmarks of UF.
-              Check back soon for the Daily Midnight ET competition!
+              We are currently working on uploading more daily locations.
+              Check back soon for the Daily!
             </p>
           </div>
 
