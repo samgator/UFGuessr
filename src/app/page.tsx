@@ -289,7 +289,7 @@ export default function Home() {
 
         <div className="flex flex-col items-center text-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
           <span>UFGuessr is built for fans of the University of Florida</span>
-          <span className="text-gray-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective Creative Commons authors.</span>
+          <span className="text-gray-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective uploaders.</span>
         </div>
       </div>
 
