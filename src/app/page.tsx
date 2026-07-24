@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin } from "lucide-react";
+import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy } from "lucide-react";
 import { compressImage } from "@/lib/imageCompression";
 
 export default function Home() {
@@ -25,6 +25,35 @@ export default function Home() {
   const [submitSubmitting, setSubmitSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [submitError, setSubmitError] = useState("");
+
+  // Contact Modal States
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const CONTACT_EMAIL = "sam.morsics@gmail.com";
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = contactSubject || "Inquiry from UFGuessr";
+    const body = `Name: ${contactName}\nEmail: ${contactEmail}\n\nMessage:\n${contactMessage}`;
+    const mailtoUrl = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+    setIsContactOpen(false);
+    setContactName("");
+    setContactEmail("");
+    setContactSubject("");
+    setContactMessage("");
+  };
+
+  const copyEmailToClipboard = () => {
+    navigator.clipboard.writeText(CONTACT_EMAIL || "");
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
 
   const handleFormMapClick = (lat: number, lng: number) => {
     setSubmitLatitude(lat.toFixed(6));
@@ -290,11 +319,19 @@ export default function Home() {
             <Linkedin className="h-4 w-4" />
             <span>LinkedIn</span>
           </a>
+          <button
+            onClick={() => setIsContactOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-xs font-bold text-gray-400 hover:text-emerald-400 transition-all duration-200"
+          >
+            <Mail className="h-4 w-4" />
+            <span>Contact</span>
+          </button>
         </div>
 
         <div className="flex flex-col items-center text-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-          <span>UFGuessr is built for fans of the University of Florida</span>
-          <span className="text-gray-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective uploaders.</span>
+          <span>UFGuessr is built for Gators</span>
+          <span className="text-slate-500 dark:text-gray-500 lowercase font-semibold normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective uploaders.</span>
+          <span className="text-slate-400 dark:text-gray-600 lowercase font-medium normal-case tracking-normal">To request an image takedown, please use the contact form.</span>
         </div>
       </div>
 
@@ -439,6 +476,93 @@ export default function Home() {
                     userGuess={submitLatitude && submitLongitude ? [parseFloat(submitLatitude), parseFloat(submitLongitude)] : null}
                   />
                 </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* CONTACT MODAL */}
+      {isContactOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="glass-card max-w-lg w-full rounded-2xl border border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col gap-4 text-left">
+            <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-3">
+              <h2 className="text-xl font-extrabold flex items-center gap-2">
+                <Mail className="h-5 w-5 text-emerald-500" /> Contact Developer
+              </h2>
+              <button
+                onClick={() => setIsContactOpen(false)}
+                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Name</label>
+                <input
+                  type="text"
+                  required
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                  placeholder="e.g. Albert Gator"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Your Email</label>
+                <input
+                  type="email"
+                  required
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                  placeholder="e.g. albert@ufl.edu"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Subject</label>
+                <input
+                  type="text"
+                  required
+                  value={contactSubject}
+                  onChange={(e) => setContactSubject(e.target.value)}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                  placeholder="e.g. Feedback about daily mode"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Message</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white resize-none"
+                  placeholder="Type your message here..."
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-end mt-2 pt-2 border-t border-gray-100 dark:border-white/5">
+                <button
+                  type="button"
+                  onClick={copyEmailToClipboard}
+                  className="px-4 py-2.5 rounded-xl glass hover:bg-gray-100 dark:hover:bg-white/5 text-xs font-bold text-white border border-white/10 flex items-center justify-center gap-1.5 transition-all active:scale-[0.98]"
+                >
+                  <Copy className="h-4 w-4" />
+                  {copiedEmail ? "Copied!" : "Copy Email"}
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/10 active:scale-[0.98]"
+                >
+                  <Send className="h-4 w-4" />
+                  Open Mail Client
+                </button>
               </div>
             </form>
           </div>
