@@ -69,6 +69,11 @@ body {
   font-family: inherit;
 }
 
+/* Adjust Leaflet zoom controls (+/- buttons) in fullscreen map mode so top header never overlaps them */
+.map-fullscreen .leaflet-top.leaflet-left {
+  top: 68px !important;
+}
+
 /* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;

@@ -78,18 +78,26 @@ function MapRecenter({
 }
 
 // Auto-resizer to continuously notify Leaflet when container dimensions change (mobile viewports, fullscreen toggles)
-function MapResizer() {
+function MapResizer({ isMapFullscreen }: { isMapFullscreen?: boolean }) {
   const map = useMap();
 
   useEffect(() => {
     map.invalidateSize();
 
-    const timer = setTimeout(() => {
-      map.invalidateSize();
-    }, 150);
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 200);
+    const t3 = setTimeout(() => map.invalidateSize(), 400);
 
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, [map, isMapFullscreen]);
+
+  useEffect(() => {
     const container = map.getContainer();
-    if (!container) return () => clearTimeout(timer);
+    if (!container) return;
 
     const resizeObserver = new ResizeObserver(() => {
       map.invalidateSize();
@@ -98,7 +106,6 @@ function MapResizer() {
     resizeObserver.observe(container);
 
     return () => {
-      clearTimeout(timer);
       resizeObserver.disconnect();
     };
   }, [map]);
@@ -112,6 +119,7 @@ interface GameMapProps {
   actualLocation?: [number, number] | null;
   showResult?: boolean;
   readonly?: boolean;
+  isMapFullscreen?: boolean;
 }
 
 export default function GameMap({
@@ -120,6 +128,7 @@ export default function GameMap({
   actualLocation,
   showResult = false,
   readonly = false,
+  isMapFullscreen = false,
 }: GameMapProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -161,7 +170,7 @@ export default function GameMap({
           updateWhenZooming={false}
         />
 
-        <MapResizer />
+        <MapResizer isMapFullscreen={isMapFullscreen} />
 
         <MapClickHandler onClick={onMapClick} enabled={!readonly && !showResult} />
 

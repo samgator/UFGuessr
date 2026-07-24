@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDistanceInMeters, calculateScore } from "@/lib/geo";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Minimize2 } from "lucide-react";
+import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Eye, X } from "lucide-react";
 
 interface Location {
   id: number;
@@ -27,8 +27,8 @@ export default function DailyGamePage() {
   const [distance, setDistance] = useState(0);
   const [copied, setCopied] = useState(false);
   const [mapExpanded, setMapExpanded] = useState(false);
-  const [splitScreen, setSplitScreen] = useState(false);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [peekPhoto, setPeekPhoto] = useState(false);
 
   // Load Daily Game State
   const fetchDailyGame = async () => {
@@ -190,10 +190,10 @@ export default function DailyGamePage() {
   }
 
   return (
-    <div className={`flex-1 w-full flex relative ${splitScreen ? "flex-col md:flex-row h-[calc(100vh-65px)]" : "flex-col"}`}>
+    <div className="flex-1 w-full flex flex-col relative min-h-[calc(100vh-65px)] overflow-hidden">
       
       {/* 1. Full Image Showcase Area */}
-      <div className={`relative flex-1 bg-slate-950 flex items-center justify-center overflow-hidden ${splitScreen ? "w-full md:w-1/2 h-1/2 md:h-full" : "min-h-[calc(100vh-180px)]"}`}>
+      <div className="relative bg-slate-950 flex-1 flex items-center justify-center overflow-hidden min-h-[calc(100vh-180px)]">
         <Image
           src={location.imageUrl}
           alt="Daily Target Location"
@@ -224,67 +224,151 @@ export default function DailyGamePage() {
           </div>
         </div>
 
-        {/* Floating Controller / Toggle for layouts */}
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
-          <button
-            onClick={() => setSplitScreen(!splitScreen)}
-            className="p-3 rounded-xl glass-dark text-white border border-white/10 hover:bg-white/10 transition-colors shadow-2xl"
-            title={splitScreen ? "Toggle Full Image" : "Toggle Split Screen"}
-          >
-            <ArrowRight className="h-4 w-4 rotate-95" />
-          </button>
-        </div>
-
         {/* Bottom Banner/Hint prompt */}
         {!hasGuessed && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 glass-dark py-2 px-5 rounded-full border border-white/10 text-white text-xs font-medium shadow-2xl flex items-center gap-1.5">
-            <Trophy className="h-4 w-4 text-yellow-400" />
-            <span>This is the daily competitive map. Submit your guess to lock in your score!</span>
+          <div className="absolute bottom-16 sm:bottom-4 left-1/2 -translate-x-1/2 z-10 glass-dark py-2 px-5 rounded-full border border-white/10 text-white text-xs font-medium shadow-2xl flex items-center gap-1.5 max-w-[90vw] text-center">
+            <Trophy className="h-4 w-4 text-yellow-400 flex-shrink-0" />
+            <span className="truncate sm:whitespace-normal">Submit your guess to lock in today&apos;s score!</span>
           </div>
         )}
       </div>
+
+      {/* Mobile Responsive Navigation Dock Bar */}
+      {!isMapFullscreen && (
+        <div className="md:hidden fixed bottom-3 left-3 right-3 z-30 flex items-center justify-center gap-2 p-1.5 glass-dark rounded-2xl border border-white/10 shadow-2xl">
+          <button
+            onClick={() => {
+              setIsMapFullscreen(false);
+              setMapExpanded(false);
+            }}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              !isMapFullscreen && !mapExpanded
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-300 hover:bg-white/10"
+            }`}
+          >
+            <Eye className="h-3.5 w-3.5" /> Photo
+          </button>
+          <button
+            onClick={() => {
+              setIsMapFullscreen(false);
+              setMapExpanded(!mapExpanded);
+            }}
+            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+              mapExpanded && !isMapFullscreen
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-300 hover:bg-white/10"
+            }`}
+          >
+            <MapPin className="h-3.5 w-3.5" /> {mapExpanded ? "Small Map" : "Expand Map"}
+          </button>
+          <button
+            onClick={() => setIsMapFullscreen(true)}
+            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30"
+          >
+            <Maximize2 className="h-3.5 w-3.5" /> Full Map
+          </button>
+        </div>
+      )}
 
       {/* 2. Interactive Map Container */}
       <div
         className={`transition-all duration-300 ${
           isMapFullscreen
-            ? "fixed inset-0 w-screen h-[100dvh] z-50 bg-slate-900 p-0 rounded-none"
-            : splitScreen
-            ? "z-20 w-full md:w-1/2 h-1/2 md:h-full border-t md:border-t-0 md:border-l border-white/10 bg-slate-900"
-            : `z-20 absolute bottom-6 right-6 ${
+            ? "fixed inset-0 w-screen h-[100dvh] z-[9999] bg-slate-900 p-0 rounded-none map-fullscreen"
+            : `z-20 absolute bottom-16 sm:bottom-6 right-3 sm:right-6 ${
                 mapExpanded
-                  ? "w-[340px] h-[280px] sm:w-[500px] sm:h-[400px]"
-                  : "w-[260px] h-[180px] sm:w-[320px] sm:h-[240px]"
+                  ? "w-[calc(100vw-24px)] sm:w-[500px] h-[320px] sm:h-[400px]"
+                  : "w-[240px] h-[160px] sm:w-[320px] sm:h-[240px]"
               } group shadow-2xl hover:border-blue-500/30 border border-white/10 bg-slate-50 dark:bg-slate-900/90 rounded-2xl overflow-hidden p-1.5`
         }`}
-        onMouseEnter={() => !splitScreen && !isMapFullscreen && setMapExpanded(true)}
-        onMouseLeave={() => !splitScreen && !isMapFullscreen && setMapExpanded(false)}
+        onMouseEnter={() => !isMapFullscreen && setMapExpanded(true)}
+        onMouseLeave={() => !isMapFullscreen && setMapExpanded(false)}
       >
         <div className="w-full h-full relative flex flex-col">
-          {/* Small floating header inside map for floating mode */}
-          {!splitScreen && !isMapFullscreen && (
-            <div className="absolute top-3 left-3 z-[1002] glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
-              <MapPin className="h-3 w-3 text-blue-400" />
-              <span>Campus Map</span>
+          
+          {/* Top Control Bar for Fullscreen Map (Highest Z-Index & Isolated Touch Events) */}
+          {isMapFullscreen ? (
+            <div
+              className="fixed top-0 left-0 right-0 z-[99999] p-3 sm:p-4 bg-slate-900/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between shadow-2xl pointer-events-auto"
+              onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPeekPhoto(!peekPhoto);
+                }}
+                onTouchEnd={(e) => {
+                  e.stopPropagation();
+                  setPeekPhoto(!peekPhoto);
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-dark text-white font-bold text-xs hover:bg-white/15 transition-all border border-white/10 cursor-pointer"
+              >
+                <Eye className="h-4 w-4 text-blue-400" />
+                <span>{peekPhoto ? "Hide Photo" : "Peek Photo"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setIsMapFullscreen(false);
+                }}
+                onTouchEnd={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  setIsMapFullscreen(false);
+                }}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 active:bg-orange-700 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl border border-orange-500/30 cursor-pointer"
+              >
+                <X className="h-4 w-4" /> Close Map
+              </button>
+            </div>
+          ) : (
+            /* Floating mode controls */
+            <div className="absolute top-3 right-3 z-[1002] flex items-center gap-1.5">
+              <div className="glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
+                <MapPin className="h-3 w-3 text-blue-400" />
+                <span>Campus Map</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMapFullscreen(true)}
+                className="p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg"
+                title="Fullscreen Map"
+              >
+                <Maximize2 className="h-3.5 w-3.5" />
+              </button>
             </div>
           )}
 
-          {/* Fullscreen / Exit Controls */}
-          {isMapFullscreen ? (
-            <button
-              onClick={() => setIsMapFullscreen(false)}
-              className="absolute top-4 right-4 z-[1002] flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-2xl border border-orange-500/20"
+          {/* Peek Photo Overlay Modal when in Fullscreen Map */}
+          {isMapFullscreen && peekPhoto && location && (
+            <div
+              className="fixed top-16 left-4 z-[99999] max-w-sm w-[calc(100vw-32px)] sm:w-80 rounded-2xl glass-dark p-2 border border-white/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
             >
-              <Minimize2 className="h-4 w-4" /> Exit Fullscreen
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsMapFullscreen(true)}
-              className="absolute top-3 right-3 z-[1002] p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg"
-              title="Fullscreen Map"
-            >
-              <Maximize2 className="h-3.5 w-3.5" />
-            </button>
+              <div className="relative w-full h-56 rounded-xl overflow-hidden bg-slate-950">
+                <Image
+                  src={location.imageUrl}
+                  alt="Landmark Peek"
+                  fill
+                  className="object-contain"
+                  sizes="320px"
+                  referrerPolicy="no-referrer"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPeekPhoto(false)}
+                  className="absolute top-2 right-2 p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Map view */}
@@ -295,11 +379,12 @@ export default function DailyGamePage() {
               actualLocation={hasGuessed ? [location.latitude, location.longitude] : null}
               showResult={hasGuessed}
               readonly={hasGuessed}
+              isMapFullscreen={isMapFullscreen}
             />
           </div>
 
           {/* Control Bar: Pin placement & Guess action */}
-          <div className="p-3 bg-white/95 dark:bg-slate-900/95 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2 rounded-b-xl">
+          <div className="p-3 bg-white/95 dark:bg-slate-900/95 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2 rounded-b-xl z-[1001]">
             {/* If has not guessed, show guess validation status or guide */}
             {!hasGuessed ? (
               <div className="flex items-center justify-between gap-2">
@@ -315,7 +400,7 @@ export default function DailyGamePage() {
                 <button
                   onClick={handleGuess}
                   disabled={!userGuess}
-                  className="px-6 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none"
+                  className="px-6 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
                 >
                   Guess
                 </button>

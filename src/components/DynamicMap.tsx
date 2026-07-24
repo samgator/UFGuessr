@@ -24,6 +24,7 @@ interface DynamicMapProps {
   actualLocation?: [number, number] | null;
   showResult?: boolean;
   readonly?: boolean;
+  isMapFullscreen?: boolean;
 }
 
 export default function DynamicMap(props: DynamicMapProps) {
