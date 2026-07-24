@@ -77,6 +77,35 @@ function MapRecenter({
   return null;
 }
 
+// Auto-resizer to continuously notify Leaflet when container dimensions change (mobile viewports, fullscreen toggles)
+function MapResizer() {
+  const map = useMap();
+
+  useEffect(() => {
+    map.invalidateSize();
+
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 150);
+
+    const container = map.getContainer();
+    if (!container) return () => clearTimeout(timer);
+
+    const resizeObserver = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+
+    resizeObserver.observe(container);
+
+    return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
+    };
+  }, [map]);
+
+  return null;
+}
+
 interface GameMapProps {
   onMapClick?: (lat: number, lng: number) => void;
   userGuess?: [number, number] | null;
@@ -118,13 +147,21 @@ export default function GameMap({
         minZoom={13}
         maxZoom={18}
         maxBounds={bounds}
-        maxBoundsViscosity={1.0}
+        maxBoundsViscosity={0.7}
         style={{ width: "100%", height: "100%" }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxNativeZoom={19}
+          maxZoom={19}
+          keepBuffer={10}
+          updateWhenIdle={false}
+          updateWhenZooming={false}
         />
+
+        <MapResizer />
 
         <MapClickHandler onClick={onMapClick} enabled={!readonly && !showResult} />
 

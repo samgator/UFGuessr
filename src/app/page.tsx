@@ -353,13 +353,13 @@ export default function Home() {
       {/* USER SUBMISSION MODAL */}
       {isSubmitOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="glass-card max-w-4xl w-full rounded-2xl border border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-left">
+          <div className="glass-card max-w-4xl w-full rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col gap-4 max-h-[90vh] overflow-y-auto text-left bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">
             
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-3">
-              <h2 className="text-xl font-extrabold">Submit a Campus Landmark</h2>
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
+              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Submit a Campus Landmark</h2>
               <button
                 onClick={() => setIsSubmitOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -369,111 +369,111 @@ export default function Home() {
               {/* Left Column: Inputs */}
               <div className="flex flex-col gap-3">
                 {submitError && (
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold">
                     {submitError}
                   </div>
                 )}
                 {submitSuccess && (
-                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold">
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold">
                     {submitSuccess}
                   </div>
                 )}
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Landmark Name</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Landmark Name</label>
                   <input
                     type="text"
                     required
                     value={submitName}
                     onChange={(e) => setSubmitName(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                     placeholder="e.g. Century Tower"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Uploader Name (Your Credit)</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Uploader Name (Your Credit)</label>
                   <input
                     type="text"
                     value={submitUploader}
                     onChange={(e) => setSubmitUploader(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                     placeholder="e.g. Albert the Gator (leave blank for Anonymous)"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Difficulty Rating</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Difficulty Rating</label>
                   <select
                     required
                     value={submitDifficulty}
                     onChange={(e) => setSubmitDifficulty(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white shadow-sm cursor-pointer"
                   >
-                    <option value="easy" className="bg-slate-950">Easy (Well-known campus hubs)</option>
-                    <option value="medium" className="bg-slate-950">Medium (Standard library paths/halls)</option>
-                    <option value="hard" className="bg-slate-950">Hard (Niche brick walls/sub-halls)</option>
+                    <option value="easy" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Easy (Well-known campus hubs)</option>
+                    <option value="medium" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Medium (Standard library paths/halls)</option>
+                    <option value="hard" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Hard (Niche brick walls/sub-halls)</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Latitude</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Latitude</label>
                     <input
                       type="number"
                       step="any"
                       required
                       value={submitLatitude}
                       onChange={(e) => setSubmitLatitude(e.target.value)}
-                      className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                      className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                       placeholder="e.g. 29.6488"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Longitude</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Longitude</label>
                     <input
                       type="number"
                       step="any"
                       required
                       value={submitLongitude}
                       onChange={(e) => setSubmitLongitude(e.target.value)}
-                      className="px-3 py-2.5 rounded-xl bg-white/5 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition-all text-white"
+                      className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                       placeholder="e.g. -82.3433"
                     />
                   </div>
                 </div>
 
-                <div className="text-[10px] text-gray-400 flex items-start gap-1 p-2 bg-slate-900/10 dark:bg-slate-950/20 border border-white/5 rounded-lg leading-relaxed">
-                  <AlertTriangle className="h-3.5 w-3.5 text-orange-400 mt-0.5 flex-shrink-0" />
+                <div className="text-[11px] text-emerald-900 dark:text-emerald-300 flex items-start gap-1.5 p-2.5 bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-500/20 rounded-xl leading-relaxed shadow-sm">
+                  <AlertTriangle className="h-4 w-4 text-emerald-600 dark:text-emerald-400 mt-0.5 flex-shrink-0" />
                   <span>
-                    To specify coordinates, click on the UF campus map in the right-hand panel. Click to position the pin exactly over where you stood to take the photo!
+                    To specify coordinates, click on the UF campus map in the right-hand panel. Position the pin exactly over where you stood to take the photo!
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 border-t border-white/5 pt-3">
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Landmark Image File (Max 5MB)</label>
+                <div className="flex flex-col gap-1.5 border-t border-slate-200 dark:border-white/10 pt-3">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Landmark Image File (Max 5MB)</label>
                   <input
                     type="file"
                     accept="image/*"
                     required
                     onChange={(e) => setSubmitImageFile(e.target.files?.[0] || null)}
-                    className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-500/10 file:text-emerald-500 hover:file:bg-emerald-500/20 file:cursor-pointer cursor-pointer border border-dashed border-gray-200 dark:border-white/10 p-2 rounded-xl text-white"
+                    className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-500/10 file:text-emerald-700 dark:file:text-emerald-400 hover:file:bg-emerald-500/20 file:cursor-pointer cursor-pointer border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-slate-950/40 p-2.5 rounded-xl text-slate-900 dark:text-white shadow-sm"
                   />
                 </div>
 
-                <div className="flex gap-3 justify-end mt-4 border-t border-gray-100 dark:border-white/5 pt-4">
+                <div className="flex gap-3 justify-end mt-4 border-t border-slate-200 dark:border-white/10 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsSubmitOpen(false)}
-                    className="px-5 py-2.5 rounded-xl glass hover:bg-gray-100 dark:hover:bg-white/5 text-xs font-bold text-white border border-white/10"
+                    className="px-5 py-2.5 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 text-xs font-bold text-slate-700 dark:text-slate-200 border border-slate-300/80 dark:border-white/10 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitSubmitting}
-                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-800 disabled:text-gray-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1 shadow-md shadow-emerald-500/10"
+                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:text-slate-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1 shadow-md shadow-emerald-500/10"
                   >
                     {submitSubmitting ? "Submitting..." : "Submit Photo"}
                   </button>
@@ -482,10 +482,10 @@ export default function Home() {
 
               {/* Right Column: Coordinate Map Pin Selector */}
               <div className="flex flex-col h-[300px] md:h-auto min-h-[350px]">
-                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                  <MapPin className="h-4 w-4 text-emerald-500 animate-bounce" /> Click map to select coordinates
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1">
+                  <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-bounce" /> Click map to select coordinates
                 </label>
-                <div className="flex-1 relative rounded-xl overflow-hidden border border-white/10">
+                <div className="flex-1 relative rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
                   <DynamicMap
                     onMapClick={handleFormMapClick}
                     userGuess={submitLatitude && submitLongitude ? [parseFloat(submitLatitude), parseFloat(submitLongitude)] : null}

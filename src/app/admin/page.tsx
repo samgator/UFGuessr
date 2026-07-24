@@ -709,16 +709,16 @@ export default function AdminPage() {
                 )}
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Select Landmark</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-400 uppercase tracking-wider">Select Landmark</label>
                   <select
                     required
                     value={queueLocationId}
                     onChange={(e) => setQueueLocationId(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                    className="px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
                   >
-                    <option value="">-- Choose location --</option>
+                    <option value="" className="bg-white dark:bg-slate-950 text-gray-900 dark:text-white">-- Choose location --</option>
                     {locations.map((loc) => (
-                      <option key={loc.id} value={loc.id}>
+                      <option key={loc.id} value={loc.id} className="bg-white dark:bg-slate-950 text-gray-900 dark:text-white">
                         {loc.name} ({loc.difficulty})
                       </option>
                     ))}
@@ -726,13 +726,13 @@ export default function AdminPage() {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date</label>
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-400 uppercase tracking-wider">Date</label>
                   <input
                     type="date"
                     required
                     value={queueDate}
                     onChange={(e) => setQueueDate(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                    className="px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-300 dark:border-white/10 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white"
                   />
                 </div>
 
@@ -1002,15 +1002,15 @@ export default function AdminPage() {
       {/* CRUD MODAL FORM (ADD/EDIT LOCATION) */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-          <div className="glass-card max-w-4xl w-full rounded-2xl border border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+          <div className="glass-card max-w-4xl w-full rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-2xl p-5 sm:p-8 flex flex-col gap-4 max-h-[90vh] overflow-y-auto bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white">
             
-            <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-3">
-              <h2 className="text-xl font-extrabold">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
+              <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
                 {editingLocation ? "Modify Campus Landmark" : "Add New Campus Landmark"}
               </h2>
               <button
                 onClick={() => setIsFormOpen(false)}
-                className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-white/5 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -1020,112 +1020,112 @@ export default function AdminPage() {
               {/* Left Column: Form inputs */}
               <div className="flex flex-col gap-3">
                 {formError && (
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold">
+                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 text-xs font-semibold">
                     {formError}
                   </div>
                 )}
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Landmark Name</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Landmark Name</label>
                   <input
                     type="text"
                     required
                     value={formName}
                     onChange={(e) => setFormName(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                     placeholder="e.g. Century Tower"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Difficulty</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Difficulty</label>
                   <select
                     required
                     value={formDifficulty}
                     onChange={(e) => setFormDifficulty(e.target.value)}
-                    className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white shadow-sm cursor-pointer"
                   >
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
+                    <option value="easy" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Easy</option>
+                    <option value="medium" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Medium</option>
+                    <option value="hard" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Hard</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Latitude</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Latitude</label>
                     <input
                       type="number"
                       step="any"
                       required
                       value={formLatitude}
                       onChange={(e) => setFormLatitude(e.target.value)}
-                      className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                      className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                       placeholder="e.g. 29.6488"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Longitude</label>
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Longitude</label>
                     <input
                       type="number"
                       step="any"
                       required
                       value={formLongitude}
                       onChange={(e) => setFormLongitude(e.target.value)}
-                      className="px-3 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                      className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                       placeholder="e.g. -82.3433"
                     />
                   </div>
                 </div>
 
                 {/* Coordinate Info Banner */}
-                <div className="text-[10px] text-gray-400 flex items-start gap-1 p-2 bg-slate-900/10 dark:bg-slate-950/20 border border-white/5 rounded-lg leading-relaxed">
-                  <AlertTriangle className="h-3 w-3 text-orange-400 mt-0.5 flex-shrink-0" />
+                <div className="text-[11px] text-blue-900 dark:text-blue-300 flex items-start gap-1.5 p-2.5 bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-500/20 rounded-xl leading-relaxed shadow-sm">
+                  <AlertTriangle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                   <span>
                     To choose coordinates, click directly on the UF campus map in the right-hand panel. It will autofill fields automatically!
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-1.5 border-t border-white/5 pt-3">
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Landmark Image</label>
+                <div className="flex flex-col gap-1.5 border-t border-slate-200 dark:border-white/10 pt-3">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Landmark Image</label>
                   
                   {/* File Upload Option */}
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-gray-400">Option A: Upload Image File (Max 5MB)</span>
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Option A: Upload Image File (Max 5MB)</span>
                     <input
                       type="file"
                       accept="image/*"
                       onChange={(e) => setFormImageFile(e.target.files?.[0] || null)}
-                      className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/10 file:text-blue-500 hover:file:bg-blue-500/20 file:cursor-pointer cursor-pointer border border-dashed border-gray-200 dark:border-white/10 p-2 rounded-xl"
+                      className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-500/10 file:text-blue-700 dark:file:text-blue-400 hover:file:bg-blue-500/20 file:cursor-pointer cursor-pointer border border-dashed border-slate-300 dark:border-white/15 bg-white dark:bg-slate-950/40 p-2.5 rounded-xl text-slate-900 dark:text-white shadow-sm"
                     />
                   </div>
 
                   {/* External URL Option */}
                   <div className="flex flex-col gap-1 mt-1">
-                    <span className="text-[10px] font-bold text-gray-400">Option B: Use External Image URL</span>
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Option B: Use External Image URL</span>
                     <input
                       type="url"
                       value={formExternalUrl}
                       onChange={(e) => setFormExternalUrl(e.target.value)}
-                      className="px-3 py-2 py-2.5 rounded-xl bg-white/50 dark:bg-slate-900 border border-gray-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all dark:text-white"
+                      className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
                       placeholder="https://example.com/image.jpg"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-3 justify-end mt-4 border-t border-gray-100 dark:border-white/5 pt-4">
+                <div className="flex gap-3 justify-end mt-4 border-t border-slate-200 dark:border-white/10 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsFormOpen(false)}
-                    className="px-5 py-2.5 rounded-xl glass hover:bg-gray-100 dark:hover:bg-white/5 text-xs font-bold"
+                    className="px-5 py-2.5 rounded-xl hover:bg-slate-200/60 dark:hover:bg-white/5 text-xs font-bold text-slate-700 dark:text-slate-200 border border-slate-300/80 dark:border-white/10 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={formSubmitting}
-                    className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1"
+                    className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all flex items-center gap-1 shadow-md shadow-blue-500/10"
                   >
                     {formSubmitting ? "Saving..." : "Save Landmark"}
                   </button>
@@ -1134,10 +1134,10 @@ export default function AdminPage() {
 
               {/* Right Column: Coordinate picker map */}
               <div className="flex flex-col gap-2 min-h-[300px]">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider pl-1 flex items-center gap-1">
-                  <MapPin className="h-4 w-4 text-blue-500 animate-bounce" /> Click map to select coordinates
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider pl-1 flex items-center gap-1">
+                  <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-bounce" /> Click map to select coordinates
                 </label>
-                <div className="flex-1 relative rounded-xl overflow-hidden border border-white/10">
+                <div className="flex-1 relative rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
                   <DynamicMap
                     onMapClick={handleFormMapClick}
                     userGuess={formLatitude && formLongitude ? [parseFloat(formLatitude), parseFloat(formLongitude)] : null}

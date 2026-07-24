@@ -48,6 +48,7 @@ yarn-error.log*
 *.sw?
 /.devin/
 /.agents/
+AGENTS.md
 
 # OS files
 Thumbs.db

@@ -7,10 +7,10 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const settingsList = await prisma.settings.findMany();
-    const settingsMap = settingsList.reduce((acc, curr) => {
+    const settingsMap = settingsList.reduce((acc: Record<string, string>, curr: { key: string; value: string }) => {
       acc[curr.key] = curr.value;
       return acc;
-    }, {} as Record<string, string>);
+    }, {});
 
     return NextResponse.json(settingsMap);
   } catch (error) {
