@@ -5,13 +5,21 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // 1. Fetch all active locations that are NOT in the daily queue
+    // 1. Check if we should exclude daily-queued locations from archive games
+    const excludeSetting = await prisma.settings.findUnique({
+      where: { key: "exclude_queued_from_archive" },
+    });
+    const excludeQueued = excludeSetting ? excludeSetting.value === "true" : true; // default to true
+
+    // 2. Fetch active locations
     const allLocations = await prisma.location.findMany({
       where: {
         approved: true,
-        dailyQueues: {
-          none: {}, // Excludes any location that is scheduled in the daily queue
-        },
+        ...(excludeQueued ? {
+          dailyQueues: {
+            none: {}, // Excludes any location that is scheduled in the daily queue
+          },
+        } : {}),
       },
     });
 

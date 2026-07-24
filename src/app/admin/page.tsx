@@ -20,6 +20,7 @@ import {
   Inbox,
   Check,
   XCircle,
+  Archive,
 } from "lucide-react";
 
 interface Location {
@@ -787,6 +788,7 @@ export default function AdminPage() {
         <div className="max-w-xl flex flex-col gap-4">
           <h2 className="font-extrabold text-lg">Global Setting Toggles</h2>
           
+          {/* Under Construction Toggle */}
           <div className="glass-card p-6 rounded-2xl border border-white/10 shadow-lg flex items-center justify-between gap-6">
             <div className="flex items-start gap-3">
               <div className="bg-yellow-500/10 p-2.5 rounded-xl text-yellow-500 mt-0.5">
@@ -812,6 +814,36 @@ export default function AdminPage() {
               <span
                 className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
                   settings.daily_under_construction === "true" ? "translate-x-5" : "translate-x-0"
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* Exclude Queued From Archive Toggle */}
+          <div className="glass-card p-6 rounded-2xl border border-white/10 shadow-lg flex items-center justify-between gap-6">
+            <div className="flex items-start gap-3">
+              <div className="bg-blue-500/10 p-2.5 rounded-xl text-blue-500 mt-0.5">
+                <Archive className="h-5 w-5" />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <h3 className="font-bold text-base">Exclude Daily Queued from Archive</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm">
+                  When enabled, any locations currently scheduled in the Daily Challenge queue are hidden from the Archive mode to maintain challenge uniqueness.
+                </p>
+              </div>
+            </div>
+
+            {/* Toggle Switch */}
+            <button
+              onClick={() => handleSettingToggle("exclude_queued_from_archive", settings.exclude_queued_from_archive !== "false" ? "true" : "false")}
+              disabled={settingsSaving}
+              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none ${
+                settings.exclude_queued_from_archive !== "false" ? "bg-blue-500" : "bg-gray-300 dark:bg-slate-700"
+              }`}
+            >
+              <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  settings.exclude_queued_from_archive !== "false" ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </button>

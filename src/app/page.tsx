@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy } from "lucide-react";
+import { MapPin, Archive, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy } from "lucide-react";
 import { compressImage } from "@/lib/imageCompression";
 
 export default function Home() {
@@ -165,7 +165,7 @@ export default function Home() {
         <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between gap-6 hover:scale-[1.01] hover:border-blue-500/20 transition-all duration-300 group shadow-lg">
           <div className="flex flex-col gap-3">
             <div className="bg-blue-600/15 p-3 rounded-2xl w-fit text-blue-600 dark:text-blue-400 shadow-inner">
-              <Trophy className="h-6 w-6" />
+              <Archive className="h-6 w-6" />
             </div>
             <h2 className="text-2xl font-extrabold tracking-tight">Archive Game Mode</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
