@@ -98,6 +98,7 @@ export default function Home() {
         setSubmitLongitude("");
         setSubmitImageFile(null);
         setSubmitUploader("");
+        setIsSubmitOpen(false); // Close the submission modal on successful submit
       } else {
         setSubmitError(data.error || "Failed to submit landmark.");
       }
@@ -226,29 +227,43 @@ export default function Home() {
       </div>
 
       {/* User Submission Feature Card */}
-      <div className="glass-card w-full p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 z-10 shadow-lg hover:border-emerald-500/20 transition-all duration-300">
-        <div className="flex flex-col gap-2 max-w-xl">
-          <div className="flex items-center gap-2">
-            <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
-              <UploadCloud className="h-5 w-5" />
-            </div>
-            <span className="font-extrabold text-[10px] sm:text-xs text-emerald-500 uppercase tracking-widest">Community Submissions</span>
+      <div className="flex flex-col gap-4 w-full z-10">
+        {submitSuccess && (
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm font-semibold flex items-center justify-between gap-3 animate-pulse shadow-sm">
+            <span className="flex items-center gap-2">🎉 {submitSuccess}</span>
+            <button 
+              onClick={() => setSubmitSuccess("")} 
+              className="text-xs font-bold underline hover:text-emerald-400 transition-colors"
+            >
+              Dismiss
+            </button>
           </div>
-          <h3 className="text-xl font-extrabold tracking-tight mt-1">Suggest a Campus Landmark</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-            Have a great photo of a hidden campus spot or iconic landmark? Upload your photo, specify its precise map coordinates, and submit it for review to be featured in the game!
-          </p>
+        )}
+
+        <div className="glass-card w-full p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-lg hover:border-emerald-500/20 transition-all duration-300">
+          <div className="flex flex-col gap-2 max-w-xl">
+            <div className="flex items-center gap-2">
+              <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
+                <UploadCloud className="h-5 w-5" />
+              </div>
+              <span className="font-extrabold text-[10px] sm:text-xs text-emerald-500 uppercase tracking-widest">Community Submissions</span>
+            </div>
+            <h3 className="text-xl font-extrabold tracking-tight mt-1">Suggest a Campus Landmark</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+              Have a great photo of a hidden campus spot or iconic landmark? Upload your photo, specify its precise map coordinates, and submit it for review to be featured in the game!
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setSubmitSuccess("");
+              setSubmitError("");
+              setIsSubmitOpen(true);
+            }}
+            className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/15 transform active:scale-95 transition-all whitespace-nowrap"
+          >
+            <Plus className="h-4 w-4" /> Submit Landmark
+          </button>
         </div>
-        <button
-          onClick={() => {
-            setSubmitSuccess("");
-            setSubmitError("");
-            setIsSubmitOpen(true);
-          }}
-          className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/15 transform active:scale-95 transition-all whitespace-nowrap"
-        >
-          <Plus className="h-4 w-4" /> Submit Landmark
-        </button>
       </div>
 
       {/* Rules and Scoring Details Block */}
