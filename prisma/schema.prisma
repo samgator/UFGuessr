@@ -25,6 +25,7 @@ model Location {
   imageUrl    Bytes
   difficulty  String
   approved    Boolean      @default(true)
+  archived    Boolean      @default(false)
   uploader    String?      @default("Anonymous")
   createdAt   DateTime     @default(now())
   dailyQueues DailyQueue[]

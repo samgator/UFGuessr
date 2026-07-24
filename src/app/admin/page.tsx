@@ -31,6 +31,7 @@ interface Location {
   imageUrl: string;
   difficulty: string;
   approved?: boolean;
+  archived?: boolean;
   uploader?: string | null;
   createdAt?: string;
 }
@@ -87,6 +88,9 @@ export default function AdminPage() {
 
   // Settings State
   const [settingsSaving, setSettingsSubmitting] = useState(false);
+
+  // Filter States
+  const [locationFilter, setLocationFilter] = useState<"all" | "active" | "archived">("all");
 
   // Verify authentication on mount
   const checkAuth = async () => {
@@ -564,47 +568,95 @@ export default function AdminPage() {
       {/* TAB CONTENT: LOCATIONS CRUD */}
       {activeTab === "locations" && (
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between pl-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-1">
             <div>
               <h2 className="text-lg font-extrabold">Active Campus Locations</h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">Manage standard landmarks pool</p>
             </div>
-            <button
-              onClick={openAddModal}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10"
-            >
-              <Plus className="h-4 w-4" /> Add Landmark
-            </button>
+            
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Filter Toggles */}
+              <div className="flex bg-gray-100 dark:bg-slate-900 p-1 rounded-xl border border-gray-200 dark:border-white/5">
+                <button
+                  onClick={() => setLocationFilter("all")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    locationFilter === "all"
+                      ? "bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                  }`}
+                >
+                  All ({locations.length})
+                </button>
+                <button
+                  onClick={() => setLocationFilter("active")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    locationFilter === "active"
+                      ? "bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                  }`}
+                >
+                  Active ({locations.filter(l => !l.archived).length})
+                </button>
+                <button
+                  onClick={() => setLocationFilter("archived")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    locationFilter === "archived"
+                      ? "bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400"
+                      : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                  }`}
+                >
+                  Archived ({locations.filter(l => l.archived).length})
+                </button>
+              </div>
+
+              <button
+                onClick={openAddModal}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10"
+              >
+                <Plus className="h-4 w-4" /> Add Landmark
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {locations.map((loc) => (
-              <div
-                key={loc.id}
-                className="glass-card rounded-2xl overflow-hidden border border-white/5 flex flex-col shadow-lg group hover:scale-[1.01] transition-transform duration-200"
-              >
-                {/* Location Image */}
-                <div className="relative h-44 bg-gray-200 dark:bg-gray-800 border-b border-white/10">
-                  <Image
-                    src={loc.imageUrl}
-                    alt={loc.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded shadow ${
-                      loc.difficulty === "easy"
-                        ? "bg-emerald-500 text-white"
-                        : loc.difficulty === "medium"
-                        ? "bg-yellow-500 text-slate-900"
-                        : "bg-red-500 text-white"
-                    }`}>
-                      {loc.difficulty}
-                    </span>
+            {locations
+              .filter((loc) => {
+                if (locationFilter === "active") return !loc.archived;
+                if (locationFilter === "archived") return loc.archived;
+                return true;
+              })
+              .map((loc) => (
+                <div
+                  key={loc.id}
+                  className="glass-card rounded-2xl overflow-hidden border border-white/5 flex flex-col shadow-lg group hover:scale-[1.01] transition-transform duration-200"
+                >
+                  {/* Location Image */}
+                  <div className="relative h-44 bg-gray-200 dark:bg-gray-800 border-b border-white/10">
+                    <Image
+                      src={loc.imageUrl}
+                      alt={loc.name}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded shadow ${
+                        loc.difficulty === "easy"
+                          ? "bg-emerald-500 text-white"
+                          : loc.difficulty === "medium"
+                          ? "bg-yellow-500 text-slate-900"
+                          : "bg-red-500 text-white"
+                      }`}>
+                        {loc.difficulty}
+                      </span>
+                      {loc.archived && (
+                        <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded shadow bg-blue-600 text-white flex items-center gap-1">
+                          <Archive className="h-2.5 w-2.5" /> Archived
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
                 {/* Info and action buttons */}
                 <div className="p-4 flex-1 flex flex-col justify-between gap-4">
@@ -819,16 +871,16 @@ export default function AdminPage() {
             </button>
           </div>
 
-          {/* Exclude Queued From Archive Toggle */}
+          {/* Limit Archive Mode to Past Daily Locations Toggle */}
           <div className="glass-card p-6 rounded-2xl border border-white/10 shadow-lg flex items-center justify-between gap-6">
             <div className="flex items-start gap-3">
               <div className="bg-blue-500/10 p-2.5 rounded-xl text-blue-500 mt-0.5">
                 <Archive className="h-5 w-5" />
               </div>
               <div className="flex flex-col gap-0.5">
-                <h3 className="font-bold text-base">Exclude Daily Queued from Archive</h3>
+                <h3 className="font-bold text-base">Limit Archive Mode to Past Daily Locations</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm">
-                  When enabled, any locations currently scheduled in the Daily Challenge queue are hidden from the Archive mode to maintain challenge uniqueness.
+                  When enabled, Archive mode will only cycle through past daily challenge locations (archived locations). When disabled, it cycles through all approved locations.
                 </p>
               </div>
             </div>

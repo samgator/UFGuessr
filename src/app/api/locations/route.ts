@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, serializeLocation } from "@/lib/db";
+import { prisma, serializeLocation, archivePastDailyLocations } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 
 // Support file uploads up to 5MB
@@ -8,6 +8,9 @@ const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"
 
 export async function GET() {
   try {
+    // Dynamically archive past daily locations before query
+    await archivePastDailyLocations();
+
     const locations = await prisma.location.findMany({
       where: { approved: true },
       orderBy: { createdAt: "desc" },

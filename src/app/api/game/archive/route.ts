@@ -1,24 +1,25 @@
 import { NextResponse } from "next/server";
-import { prisma, serializeLocation } from "@/lib/db";
+import { prisma, serializeLocation, archivePastDailyLocations } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // 1. Check if we should exclude daily-queued locations from archive games
+    // 1. Dynamically archive past daily locations
+    await archivePastDailyLocations();
+
+    // 2. Check if we should restrict archive games to only past daily (archived) locations
     const excludeSetting = await prisma.settings.findUnique({
       where: { key: "exclude_queued_from_archive" },
     });
-    const excludeQueued = excludeSetting ? excludeSetting.value === "true" : true; // default to true
+    const onlyArchived = excludeSetting ? excludeSetting.value === "true" : true; // default to true
 
-    // 2. Fetch active locations
+    // 3. Fetch approved locations
     const allLocations = await prisma.location.findMany({
       where: {
         approved: true,
-        ...(excludeQueued ? {
-          dailyQueues: {
-            none: {}, // Excludes any location that is scheduled in the daily queue
-          },
+        ...(onlyArchived ? {
+          archived: true, // Restricted to past daily (archived) locations
         } : {}),
       },
     });
