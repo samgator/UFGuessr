@@ -154,18 +154,17 @@ export default function Home() {
     <div className="flex-1 w-full flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto gap-12 relative">
 
       {/* Hero Header Block */}
-      <div className="flex flex-col items-center text-center gap-4 z-10 max-w-2xl mt-4 sm:mt-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-blue-500/20 rounded-full text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
-          <Sparkles className="h-3 w-3 text-orange-500" />
-          <span>UF Location Guessing Game</span>
-        </div>
-        
+      <div className="flex flex-col items-center text-center gap-3 z-10 max-w-2xl mt-2 sm:mt-4">
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-none">
-          Welcome to{" "}
           <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-orange-500 dark:from-blue-400 dark:via-blue-300 dark:to-orange-400 bg-clip-text text-transparent">
             UFGuessr
           </span>
         </h1>
+
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-500/10 to-orange-500/10 border border-blue-500/20 rounded-full text-[11px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">
+          <Sparkles className="h-3 w-3 text-orange-500" />
+          <span>UF Location Guessing Game</span>
+        </div>
         
         <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed mt-1">
           How well do you know the University of Florida campus? Explore high-definition campus imagery and pin matching locations on the interactive map.
@@ -175,29 +174,6 @@ export default function Home() {
       {/* Primary Action Game Modes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full z-10">
         
-        {/* Archive Mode Card */}
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl blur-xl opacity-10 dark:opacity-10 group-hover:opacity-20 transition duration-500 pointer-events-none" />
-          <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between gap-6 hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group shadow-lg relative h-full">
-            <div className="flex flex-col gap-3">
-              <div className="bg-blue-100 dark:bg-blue-600/20 p-3 rounded-2xl w-fit text-blue-600 dark:text-blue-400 shadow-inner border border-blue-200 dark:border-blue-500/30">
-                <Archive className="h-6 w-6" />
-              </div>
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Archive Game Mode</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                Play classic 5-round games anytime. Locations are randomized and non-repeating.
-              </p>
-            </div>
-
-            <Link
-              href="/game/archive"
-              className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/20 transform active:scale-95 transition-all cursor-pointer"
-            >
-              <Play className="h-4 w-4 fill-white" /> Start Archive Game
-            </Link>
-          </div>
-        </div>
-
         {/* Daily Mode Card */}
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-3xl blur-xl opacity-10 dark:opacity-10 group-hover:opacity-20 transition duration-500 pointer-events-none" />
@@ -269,6 +245,29 @@ export default function Home() {
                   <Calendar className="h-4 w-4" /> Enter Daily Challenge
                 </>
               )}
+            </Link>
+          </div>
+        </div>
+
+        {/* Archive Mode Card */}
+        <div className="relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl blur-xl opacity-10 dark:opacity-10 group-hover:opacity-20 transition duration-500 pointer-events-none" />
+          <div className="glass-card p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col justify-between gap-6 hover:scale-[1.01] hover:border-blue-500/30 transition-all duration-300 group shadow-lg relative h-full">
+            <div className="flex flex-col gap-3">
+              <div className="bg-blue-100 dark:bg-blue-600/20 p-3 rounded-2xl w-fit text-blue-600 dark:text-blue-400 shadow-inner border border-blue-200 dark:border-blue-500/30">
+                <Archive className="h-6 w-6" />
+              </div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Archive Game Mode</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                Play classic 5-round games anytime. Locations are randomized and non-repeating.
+              </p>
+            </div>
+
+            <Link
+              href="/game/archive"
+              className="w-full py-4 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/20 transform active:scale-95 transition-all cursor-pointer"
+            >
+              <Play className="h-4 w-4 fill-white" /> Start Archive Game
             </Link>
           </div>
         </div>
@@ -397,7 +396,7 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col items-center text-center gap-1 text-[11px] text-slate-700 dark:text-gray-400 font-extrabold uppercase tracking-widest">
-          <span>UFGuessr is built for Gators</span>
+          <span>UFGuessr is inspired by GeoGuessr</span>
           <span className="text-slate-700 dark:text-gray-400 lowercase font-semibold normal-case tracking-normal mt-0.5">Developed by Sam Morsics. All images belong to their respective uploaders.</span>
           <span className="text-slate-600 dark:text-gray-400 lowercase font-medium normal-case tracking-normal">To request an image takedown, please use the contact form.</span>
         </div>
