@@ -80,17 +80,18 @@ export default function Navbar() {
       </div>
 
       {/* Theme Toggler (Desktop) & Mobile Actions (Mobile) */}
-      <div className="flex justify-end items-center gap-3">
-        {/* Desktop Buy Me A Coffee (Square Icon) */}
+      <div className="flex justify-end items-center gap-2.5">
+        {/* Desktop Buy Me A Coffee */}
         <div className="hidden md:block">
           <a
             href="https://www.paypal.com/paypalme/samuelmorsics"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2.5 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-yellow-400 flex items-center justify-center p-2"
+            className="px-3.5 py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm"
             aria-label="Buy Me A Coffee"
           >
-            <Coffee className="h-5 w-5" />
+            <Coffee className="h-4 w-4 text-amber-500 dark:text-yellow-400" />
+            <span>Buy Me a Coffee</span>
           </a>
         </div>
 
@@ -107,15 +108,16 @@ export default function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
-          {/* Mobile Buy Me A Coffee (Square Icon) */}
+          {/* Mobile Buy Me A Coffee */}
           <a
             href="https://www.paypal.com/paypalme/samuelmorsics"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-lg glass text-gray-600 dark:text-gray-300 hover:text-amber-500 dark:hover:text-yellow-400 flex items-center justify-center p-1.5"
+            className="px-2.5 py-1.5 rounded-lg glass text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-1.5 text-xs font-bold"
             aria-label="Buy Me A Coffee"
           >
-            <Coffee className="h-4 w-4" />
+            <Coffee className="h-3.5 w-3.5 text-amber-500 dark:text-yellow-400" />
+            <span className="hidden xs:inline sm:inline">Buy Me a Coffee</span>
           </a>
 
           <button
@@ -153,6 +155,16 @@ export default function Navbar() {
               </Link>
             );
           })}
+          <a
+            href="https://www.paypal.com/paypalme/samuelmorsics"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="text-sm font-semibold p-2.5 rounded-xl text-amber-600 dark:text-yellow-400 bg-amber-500/10 border border-amber-500/20 flex items-center gap-2"
+          >
+            <Coffee className="h-4 w-4" />
+            <span>Buy Me a Coffee</span>
+          </a>
         </div>
       )}
     </nav>

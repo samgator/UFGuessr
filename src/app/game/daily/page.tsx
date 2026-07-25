@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDistanceInMeters, calculateScore } from "@/lib/geo";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Eye, X } from "lucide-react";
+import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Eye, X, Loader2 } from "lucide-react";
 
 interface Location {
   id: number;
@@ -118,10 +118,10 @@ export default function DailyGamePage() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl flex flex-col items-center gap-4 text-center">
-          <div className="animate-spin h-10 w-10 text-blue-500" />
-          <h2 className="text-xl font-bold">Querying Midnight ET Queue...</h2>
+          <Loader2 className="animate-spin h-10 w-10 text-blue-500" />
+          <h2 className="text-xl font-bold">Querying The Queue...</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Checking feature flags and fetching today&apos;s campus location.
+            Fetching today&apos;s campus location.
           </p>
         </div>
       </div>
@@ -319,11 +319,7 @@ export default function DailyGamePage() {
             </div>
           ) : (
             /* Floating mode controls */
-            <div className="absolute top-3 right-3 z-[1002] flex items-center gap-1.5">
-              <div className="glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
-                <MapPin className="h-3 w-3 text-blue-400" />
-                <span>Campus Map</span>
-              </div>
+            <div className="absolute top-3 right-3 z-[1002]">
               <button
                 type="button"
                 onClick={() => setIsMapFullscreen(true)}
@@ -398,29 +394,29 @@ export default function DailyGamePage() {
             ) : (
               /* If has guessed, show daily results and sharing action */
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5">
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5 pr-8 sm:pr-0">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Distance Off</span>
-                    <span className="font-extrabold text-sm text-slate-800 dark:text-white">
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-white">
                       {distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(2)}km`}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Score Earned</span>
-                    <span className="font-black text-xl text-yellow-500">
+                    <span className="font-black text-xs sm:text-base text-yellow-500">
                       {score.toLocaleString()} / 5,000 pts
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] font-bold text-gray-600 dark:text-gray-300 max-w-[130px] truncate" title={location.name}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={location.name}>
                     {location.name}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className="flex items-center gap-1 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10"
+                      className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
                     >
                       {copied ? (
                         <>
@@ -428,13 +424,13 @@ export default function DailyGamePage() {
                         </>
                       ) : (
                         <>
-                          <Share2 className="h-3.5 w-3.5" /> Share Score
+                          <Share2 className="h-3.5 w-3.5" /> Share
                         </>
                       )}
                     </button>
                     <Link
                       href="/"
-                      className="px-3.5 py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300 font-bold text-xs"
+                      className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300 font-bold text-[11px] sm:text-xs border border-white/10"
                     >
                       Home
                     </Link>

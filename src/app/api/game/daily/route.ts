@@ -1,45 +1,30 @@
 import { NextResponse } from "next/server";
-import { prisma, serializeLocation } from "@/lib/db";
+import { prisma, serializeLocation, archivePastDailyLocations, getTodayETDate } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-// Helper to get Eastern Time date string in YYYY-MM-DD
-function getEasternTimeDateString(): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
-  
-  const parts = formatter.formatToParts(new Date());
-  const year = parts.find(p => p.type === "year")?.value;
-  const month = parts.find(p => p.type === "month")?.value;
-  const day = parts.find(p => p.type === "day")?.value;
-
-  return `${year}-${month}-${day}`;
-}
-
 export async function GET() {
   try {
-    // 1. Check "Under Construction" state from DB settings
+    // 1. Archive past daily locations and remove previous locations from the queue
+    await archivePastDailyLocations();
+
+    // 2. Check "Under Construction" state from DB settings
     const underConstructionSetting = await prisma.settings.findUnique({
       where: { key: "daily_under_construction" },
     });
 
     const isUnderConstruction = underConstructionSetting?.value === "true";
 
-    // 2. Return under construction state if enabled
+    // 3. Return under construction state if enabled
     if (isUnderConstruction) {
       return NextResponse.json({
         underConstruction: true,
       });
     }
 
-    // 3. Resolve target Eastern Time date
-    const etDateStr = getEasternTimeDateString(); // e.g. "2026-07-22"
-    const targetDate = new Date(etDateStr);
-    targetDate.setUTCHours(0, 0, 0, 0); // Midnight UTC of the ET day
+    // 4. Resolve target Eastern Time date
+    const targetDate = getTodayETDate();
+    const etDateStr = targetDate.toISOString().split("T")[0];
 
     // 4. Find the scheduled queue item
     let queueItem = await prisma.dailyQueue.findFirst({

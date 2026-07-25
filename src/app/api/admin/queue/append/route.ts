@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, serializeQueueItem } from "@/lib/db";
+import { prisma, serializeQueueItem, archivePastDailyLocations, getTodayETDate } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -12,10 +12,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Fetch all active (approved) locations that are NOT already in the daily queue
+    // 2. Clean up past daily locations and remove previous locations from the queue
+    await archivePastDailyLocations();
+
+    // 3. Fetch all active (approved AND non-archived) locations that are NOT already in the daily queue
     const unqueuedLocations = await prisma.location.findMany({
       where: {
         approved: true,
+        archived: false,
         dailyQueues: {
           none: {},
         },
@@ -25,26 +29,29 @@ export async function POST(req: NextRequest) {
     if (unqueuedLocations.length === 0) {
       return NextResponse.json({
         success: true,
-        message: "No active locations available to append. All active locations are already scheduled in the queue.",
+        message: "No active locations available to append. All active non-archived locations are already scheduled in the queue.",
         count: 0,
       });
     }
 
-    // 3. Find the latest scheduled date in the daily queue
+    // 4. Find the latest scheduled date in the daily queue
     const latestQueueItem = await prisma.dailyQueue.findFirst({
       orderBy: {
         scheduledDate: "desc",
       },
     });
 
-    // 4. Calculate starting date for appending
-    let startDate = new Date();
-    startDate.setUTCHours(0, 0, 0, 0); // Start with today at midnight UTC
+    // 5. Calculate starting date for appending
+    const today = getTodayETDate();
+    let startDate = new Date(today);
 
     if (latestQueueItem) {
-      // If there is already a scheduled item, start appending on the next day
-      startDate = new Date(latestQueueItem.scheduledDate);
-      startDate.setUTCDate(startDate.getUTCDate() + 1);
+      // If there is already a scheduled item, start appending on the next day after the latest scheduled item
+      const nextDate = new Date(latestQueueItem.scheduledDate);
+      nextDate.setUTCDate(nextDate.getUTCDate() + 1);
+      if (nextDate > startDate) {
+        startDate = nextDate;
+      }
     }
 
     // 5. Append locations sequentially

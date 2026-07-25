@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma, serializeQueueItem } from "@/lib/db";
+import { prisma, serializeQueueItem, archivePastDailyLocations } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 
 export async function GET() {
   try {
+    // 1. Archive past daily locations and remove previous locations from queue
+    await archivePastDailyLocations();
+
     // Return all scheduled queue entries, sorted by scheduledDate
     const queue = await prisma.dailyQueue.findMany({
       include: {
@@ -49,6 +52,10 @@ export async function POST(req: NextRequest) {
 
     if (!location) {
       return NextResponse.json({ error: "Location not found" }, { status: 404 });
+    }
+
+    if (location.archived) {
+      return NextResponse.json({ error: "Cannot schedule an archived location in the queue" }, { status: 400 });
     }
 
     // Upsert the queue slot

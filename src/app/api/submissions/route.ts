@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, serializeLocation } from "@/lib/db";
+import { notifyNewLocationSubmission } from "@/lib/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -88,6 +89,12 @@ export async function POST(req: NextRequest) {
         approved: false,
         uploader,
       },
+    });
+
+    // Send instant push notification to phone
+    const origin = req.headers.get("origin") || req.nextUrl?.origin || "http://localhost:3000";
+    notifyNewLocationSubmission(submission, origin).catch((err) => {
+      console.error("[Submissions API] Error sending phone notification:", err);
     });
 
     return NextResponse.json({

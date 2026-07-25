@@ -21,6 +21,8 @@ import {
   Check,
   XCircle,
   Archive,
+  Bell,
+  Loader2,
 } from "lucide-react";
 
 interface Location {
@@ -88,6 +90,9 @@ export default function AdminPage() {
 
   // Settings State
   const [settingsSaving, setSettingsSubmitting] = useState(false);
+  const [ntfyTopicInput, setNtfyTopicInput] = useState("");
+  const [testNotifSending, setTestNotifSending] = useState(false);
+  const [testNotifStatus, setTestNotifStatus] = useState<{ success: boolean; msg: string } | null>(null);
 
   // Filter States
   const [locationFilter, setLocationFilter] = useState<"all" | "active" | "archived">("all");
@@ -126,7 +131,13 @@ export default function AdminPage() {
 
       if (locsRes.ok) setLocations(await locsRes.json());
       if (queueRes.ok) setQueue(await queueRes.json());
-      if (settingsRes.ok) setSettings(await settingsRes.json());
+      if (settingsRes.ok) {
+        const sData = await settingsRes.json();
+        setSettings(sData);
+        if (sData.ntfy_topic !== undefined) {
+          setNtfyTopicInput(sData.ntfy_topic);
+        }
+      }
       if (subsRes.ok) setSubmissions(await subsRes.json());
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
@@ -423,11 +434,58 @@ export default function AdminPage() {
     }
   };
 
+  const handleSaveNtfyTopic = async () => {
+    setSettingsSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: "ntfy_topic", value: ntfyTopicInput.trim() }),
+      });
+
+      if (res.ok) {
+        setTestNotifStatus({ success: true, msg: "Notification topic saved!" });
+        await loadDashboardData();
+      } else {
+        setTestNotifStatus({ success: false, msg: "Failed to save notification topic." });
+      }
+    } catch (err) {
+      console.error(err);
+      setTestNotifStatus({ success: false, msg: "Connection error saving topic." });
+    } finally {
+      setSettingsSubmitting(false);
+    }
+  };
+
+  const handleSendTestNotification = async () => {
+    setTestNotifSending(true);
+    setTestNotifStatus(null);
+    try {
+      const res = await fetch("/api/admin/test-notification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: ntfyTopicInput.trim() || undefined }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setTestNotifStatus({ success: true, msg: "Test notification sent! Check your phone." });
+      } else {
+        setTestNotifStatus({ success: false, msg: data.error || "Failed to send test notification." });
+      }
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Connection error.";
+      setTestNotifStatus({ success: false, msg: errorMsg });
+    } finally {
+      setTestNotifSending(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-sm w-full p-8 rounded-2xl flex flex-col items-center gap-4 text-center">
-          <div className="animate-spin h-8 w-8 text-blue-500" />
+          <Loader2 className="animate-spin h-10 w-10 text-blue-500" />
           <h2 className="text-lg font-bold">Querying Admin State...</h2>
         </div>
       </div>
@@ -899,6 +957,68 @@ export default function AdminPage() {
                 }`}
               />
             </button>
+          </div>
+
+          {/* Instant Phone Push Notifications (ntfy.sh) */}
+          <div className="glass-card p-6 rounded-2xl border border-white/10 shadow-lg flex flex-col gap-4">
+            <div className="flex items-start gap-3">
+              <div className="bg-emerald-500/10 p-2.5 rounded-xl text-emerald-500 mt-0.5">
+                <Bell className="h-5 w-5" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h3 className="font-bold text-base">Instant Phone Notifications (ntfy.sh)</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  Receive real-time push alerts on your phone whenever a user submits a landmark location!
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 pt-2">
+              <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                ntfy Topic Name
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  placeholder="e.g. ufguessr-submissions"
+                  value={ntfyTopicInput}
+                  onChange={(e) => setNtfyTopicInput(e.target.value)}
+                  className="flex-1 bg-white/50 dark:bg-slate-800/50 border border-black/10 dark:border-white/10 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                />
+                <button
+                  onClick={handleSaveNtfyTopic}
+                  disabled={settingsSaving}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <Check className="h-3.5 w-3.5" /> Save
+                </button>
+              </div>
+              <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-3 text-xs text-gray-600 dark:text-gray-300 space-y-1">
+                <p className="font-semibold text-emerald-600 dark:text-emerald-400">📱 How to connect your phone:</p>
+                <ol className="list-decimal list-inside space-y-0.5 text-[11px] text-gray-500 dark:text-gray-400">
+                  <li>Install the free <strong>ntfy</strong> app on your iOS or Android phone.</li>
+                  <li>Open the app, tap <strong>+ Subscribe to topic</strong>, and type: <code className="bg-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded text-emerald-600 dark:text-emerald-300 font-mono">{ntfyTopicInput || "ufguessr-submissions"}</code></li>
+                  <li>Click <strong>Send Test Notification</strong> below to verify!</li>
+                </ol>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between border-t border-black/5 dark:border-white/5 mt-1">
+                <button
+                  onClick={handleSendTestNotification}
+                  disabled={testNotifSending || !ntfyTopicInput.trim()}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <Bell className="h-3.5 w-3.5" />
+                  {testNotifSending ? "Sending..." : "Send Test Notification"}
+                </button>
+
+                {testNotifStatus && (
+                  <span className={`text-xs font-semibold ${testNotifStatus.success ? "text-emerald-500" : "text-rose-500"}`}>
+                    {testNotifStatus.msg}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

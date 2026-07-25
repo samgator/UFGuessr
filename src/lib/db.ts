@@ -55,25 +55,30 @@ export function serializeQueueItem(queueItem: DbQueueItem | null | undefined): S
   };
 }
 
+export function getTodayETDate(): Date {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  
+  const parts = formatter.formatToParts(new Date());
+  const year = parts.find(p => p.type === "year")?.value;
+  const month = parts.find(p => p.type === "month")?.value;
+  const day = parts.find(p => p.type === "day")?.value;
+
+  const etDateStr = `${year}-${month}-${day}`;
+  const todayDate = new Date(etDateStr);
+  todayDate.setUTCHours(0, 0, 0, 0); // Midnight UTC of the current Eastern Time day
+  return todayDate;
+}
+
 export async function archivePastDailyLocations() {
   try {
-    const formatter = new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-    
-    const parts = formatter.formatToParts(new Date());
-    const year = parts.find(p => p.type === "year")?.value;
-    const month = parts.find(p => p.type === "month")?.value;
-    const day = parts.find(p => p.type === "day")?.value;
+    const todayDate = getTodayETDate();
 
-    const etDateStr = `${year}-${month}-${day}`;
-    const todayDate = new Date(etDateStr);
-    todayDate.setUTCHours(0, 0, 0, 0); // Midnight UTC of the current Eastern Time day
-
-    // Mark any location that was in a daily queue with scheduledDate < todayDate as archived
+    // 1. Mark any location that was in a daily queue with scheduledDate < todayDate as archived
     await prisma.location.updateMany({
       where: {
         archived: false,
@@ -89,7 +94,16 @@ export async function archivePastDailyLocations() {
         archived: true,
       },
     });
+
+    // 2. Remove previous (past) locations from the daily queue
+    await prisma.dailyQueue.deleteMany({
+      where: {
+        scheduledDate: {
+          lt: todayDate,
+        },
+      },
+    });
   } catch (error) {
-    console.error("Failed to dynamically archive past daily locations:", error);
+    console.error("Failed to dynamically archive past daily locations and clean queue:", error);
   }
 }

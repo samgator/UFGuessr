@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Archive, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy } from "lucide-react";
+import { MapPin, Archive, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy, Check, Trophy, Eye } from "lucide-react";
 import { compressImage } from "@/lib/imageCompression";
 
 export default function Home() {
@@ -12,6 +12,8 @@ export default function Home() {
     underConstruction: false,
     loaded: false,
   });
+  const [dailyCompleted, setDailyCompleted] = useState(false);
+  const [dailyScore, setDailyScore] = useState<number | null>(null);
   const [formattedDate, setFormattedDate] = useState<string>("");
 
   // Submission States
@@ -121,6 +123,20 @@ export default function Home() {
             underConstruction: !!data.underConstruction,
             loaded: true,
           });
+
+          // Check if today's daily challenge was completed in localStorage
+          if (data.date) {
+            const savedResult = localStorage.getItem(`ufguessr_daily_${data.date}`);
+            if (savedResult) {
+              try {
+                const parsed = JSON.parse(savedResult);
+                setDailyCompleted(true);
+                setDailyScore(parsed.score ?? 0);
+              } catch (e) {
+                console.error("Failed to parse daily result from localStorage:", e);
+              }
+            }
+          }
         }
       } catch {
         setDailyStatus({ underConstruction: false, loaded: false });
@@ -192,6 +208,10 @@ export default function Home() {
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-yellow-500/20 text-yellow-500 border border-yellow-500/30">
                   Locked
                 </span>
+              ) : dailyCompleted ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                  <Check className="h-3 w-3" /> Completed
+                </span>
               ) : (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 animate-pulse">
                   Live Today
@@ -212,16 +232,41 @@ export default function Home() {
                 </span>
               )}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
-              Updates automatically at 00:00 (Midnight) Eastern Time (ET). Guess the location of the day, lock in your score, and share your results!
-            </p>
+
+            {dailyCompleted ? (
+              <div className="flex flex-col gap-2.5 my-0.5">
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                  You&apos;ve completed today&apos;s challenge! Click below to review your guess, map distance, and score breakdown.
+                </p>
+                <div className="flex items-center gap-2 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                  <Trophy className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                  <span>Today&apos;s Score: <span className="text-sm font-black text-slate-900 dark:text-white">{dailyScore?.toLocaleString() ?? 0}</span> / 5,000 pts</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                Updates automatically at 00:00 (Midnight) Eastern Time (ET). Guess the location of the day, lock in your score, and share your results!
+              </p>
+            )}
           </div>
 
           <Link
             href="/game/daily"
-            className="w-full py-4.5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-orange-500/15 transform active:scale-95 transition-all py-3.5"
+            className={`w-full rounded-2xl ${
+              dailyCompleted
+                ? "bg-blue-600 hover:bg-blue-700 shadow-blue-500/15"
+                : "bg-orange-500 hover:bg-orange-600 shadow-orange-500/15"
+            } text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transform active:scale-95 transition-all py-3.5`}
           >
-            <Calendar className="h-4 w-4" /> Enter Daily Challenge
+            {dailyCompleted ? (
+              <>
+                <Eye className="h-4 w-4" /> Review Score & View Guess
+              </>
+            ) : (
+              <>
+                <Calendar className="h-4 w-4" /> Enter Daily Challenge
+              </>
+            )}
           </Link>
         </div>
       </div>

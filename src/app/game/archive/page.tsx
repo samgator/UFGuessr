@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDistanceInMeters, calculateScore } from "@/lib/geo";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, RefreshCw, ChevronRight, Maximize2, Check, HelpCircle, Eye, X } from "lucide-react";
+import { MapPin, Trophy, RefreshCw, ChevronRight, Maximize2, Check, HelpCircle, Eye, X, Loader2 } from "lucide-react";
 
 interface Location {
   id: number;
@@ -126,10 +126,10 @@ export default function ArchiveGamePage() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl flex flex-col items-center gap-4 text-center">
-          <div className="animate-spin h-10 w-10 text-blue-500" />
+          <Loader2 className="animate-spin h-10 w-10 text-blue-500" />
           <h2 className="text-xl font-bold">Assembling UF Campus...</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Selecting standard landmarks and rendering interactive map boundaries.
+            Selecting landmarks and rendering the map.
           </p>
         </div>
       </div>
@@ -406,11 +406,7 @@ export default function ArchiveGamePage() {
             </div>
           ) : (
             /* Floating mode controls */
-            <div className="absolute top-3 right-3 z-[1002] flex items-center gap-1.5">
-              <div className="glass-dark py-1 px-2.5 rounded-lg border border-white/10 text-[10px] text-white font-bold uppercase tracking-wider flex items-center gap-1 pointer-events-none">
-                <MapPin className="h-3 w-3 text-blue-400" />
-                <span>Campus Map</span>
-              </div>
+            <div className="absolute top-3 right-3 z-[1002]">
               <button
                 type="button"
                 onClick={() => setIsMapFullscreen(true)}
@@ -485,30 +481,30 @@ export default function ArchiveGamePage() {
             ) : (
               /* If has guessed, show round metrics and action buttons */
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5">
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5 pr-8 sm:pr-0">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Distance Off</span>
-                    <span className="font-extrabold text-sm text-slate-800 dark:text-white">
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-white">
                       {roundResult && roundResult.distance < 1000
-                        ? `${Math.round(roundResult.distance)} meters`
-                        : `${(roundResult!.distance / 1000).toFixed(2)} km`}
+                        ? `${Math.round(roundResult.distance)}m`
+                        : `${(roundResult!.distance / 1000).toFixed(2)}km`}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Earned Score</span>
-                    <span className="font-black text-lg text-emerald-500 dark:text-emerald-400">
+                    <span className="font-black text-xs sm:text-base text-emerald-500 dark:text-emerald-400">
                       +{roundResult?.score} pts
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="text-[11px] font-bold text-gray-600 dark:text-gray-300 max-w-[150px] truncate" title={currentLoc.name}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={currentLoc.name}>
                     {currentLoc.name}
                   </div>
                   <button
                     onClick={handleNextRound}
-                    className="flex items-center gap-1 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
+                    className="flex-shrink-0 flex items-center gap-1 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
                   >
                     {currentRound < locations.length - 1 ? "Next Round" : "View Summary"}
                     <ChevronRight className="h-3.5 w-3.5" />
