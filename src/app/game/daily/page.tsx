@@ -261,73 +261,83 @@ export default function DailyGamePage() {
           referrerPolicy="no-referrer"
         />
 
-        {/* UI Overlay Card for Daily Info */}
-        <div className="absolute top-4 left-4 z-10 glass-dark p-3.5 sm:p-5 rounded-2xl flex flex-col gap-1 border border-white/10 text-white max-w-xs shadow-2xl">
-          <div className="flex items-center justify-between gap-6">
-            <span className="text-xs font-bold uppercase tracking-widest text-orange-400">Daily Challenge</span>
-            <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded ${
-              location.difficulty === "easy"
-                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                : location.difficulty === "medium"
-                ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                : "bg-red-500/20 text-red-400 border border-red-500/30"
-            }`}>
-              {location.difficulty}
-            </span>
+        {/* Top Info Card & Hint Pill Container */}
+        <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 flex flex-col gap-2 max-w-[calc(100vw-24px)] sm:max-w-xs">
+          {/* UI Overlay Card for Daily Info */}
+          <div className="glass-dark p-3.5 sm:p-5 rounded-2xl flex flex-col gap-1 border border-white/10 text-white w-full shadow-2xl">
+            <div className="flex items-center justify-between gap-6">
+              <span className="text-xs font-bold uppercase tracking-widest text-orange-400">Daily Challenge</span>
+              <span className={`text-[10px] uppercase font-black px-2 py-0.5 rounded ${
+                location.difficulty === "easy"
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  : location.difficulty === "medium"
+                  ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+                  : "bg-red-500/20 text-red-400 border border-red-500/30"
+              }`}>
+                {location.difficulty}
+              </span>
+            </div>
+            <h2 className="text-lg sm:text-2xl font-black mt-1">{dateStr}</h2>
+            <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-300 font-medium">
+              <Camera className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+              <span>Photo by <span className="font-bold text-white">{location.uploader || "Anonymous"}</span></span>
+            </div>
+            <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/10 text-sm font-semibold text-gray-300">
+              <span>One attempt per day</span>
+            </div>
           </div>
-          <h2 className="text-lg sm:text-2xl font-black mt-1">{dateStr}</h2>
-          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-300 font-medium">
-            <Camera className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
-            <span>Photo by <span className="font-bold text-white">{location.uploader || "Anonymous"}</span></span>
-          </div>
-          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/10 text-sm font-semibold text-gray-300">
-            <span>One attempt per day</span>
-          </div>
-        </div>
 
-        {/* Bottom Banner/Hint prompt */}
-        {!hasGuessed && (
-          <div className="absolute bottom-16 sm:bottom-4 left-1/2 -translate-x-1/2 z-10 glass-dark py-2 px-5 rounded-full border border-white/10 text-white text-xs font-medium shadow-2xl flex items-center gap-1.5 max-w-[90vw] text-center">
-            <Trophy className="h-4 w-4 text-yellow-400 flex-shrink-0" />
-            <span className="truncate sm:whitespace-normal">Submit your guess to lock in today&apos;s score!</span>
-          </div>
-        )}
+          {/* Hint prompt pill aligned below and matching width of top container */}
+          {!hasGuessed && (
+            <div className="glass-dark py-2 px-3.5 rounded-2xl border border-white/10 text-white text-xs font-medium shadow-2xl flex items-center justify-center gap-1.5 w-full text-center">
+              <Trophy className="h-4 w-4 text-yellow-400 flex-shrink-0" />
+              <span className="truncate sm:whitespace-normal">Submit your guess to lock in today&apos;s score!</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile Responsive Navigation Dock Bar */}
       {!isMapFullscreen && (
-        <div className="md:hidden fixed bottom-3 left-3 right-3 z-30 flex items-center justify-center gap-2 p-1.5 glass-dark rounded-2xl border border-white/10 shadow-2xl">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex items-center justify-center gap-2 p-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-slate-900/95 backdrop-blur-md border-t border-white/10 shadow-2xl">
           <button
             onClick={() => {
               setIsMapFullscreen(false);
               setMapExpanded(false);
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               !isMapFullscreen && !mapExpanded
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-300 hover:bg-white/10"
             }`}
           >
-            <Eye className="h-3.5 w-3.5" /> Photo
+            <Eye className="h-4 w-4" /> Photo
           </button>
           <button
             onClick={() => {
               setIsMapFullscreen(false);
               setMapExpanded(!mapExpanded);
             }}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               mapExpanded && !isMapFullscreen
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-300 hover:bg-white/10"
             }`}
           >
-            <MapPin className="h-3.5 w-3.5" /> {mapExpanded ? "Small Map" : "Expand Map"}
+            <MapPin className="h-4 w-4" />{" "}
+            {hasGuessed
+              ? mapExpanded
+                ? "Hide Map"
+                : "Review Map"
+              : mapExpanded
+              ? "Small Map"
+              : "Expand Map"}
           </button>
           <button
             onClick={() => setIsMapFullscreen(true)}
-            className="flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30"
+            className="flex-1 min-h-[44px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30 cursor-pointer"
           >
-            <Maximize2 className="h-3.5 w-3.5" /> Full Map
+            <Maximize2 className="h-4 w-4" /> Full Map
           </button>
         </div>
       )}
@@ -337,10 +347,12 @@ export default function DailyGamePage() {
         className={`transition-all duration-300 ${
           isMapFullscreen
             ? "fixed inset-0 w-screen h-[100dvh] z-[9999] bg-slate-900 p-0 rounded-none map-fullscreen"
-            : `z-20 absolute bottom-16 sm:bottom-6 right-3 sm:right-6 ${
+            : `z-40 md:z-20 absolute bottom-[calc(68px+env(safe-area-inset-bottom))] md:bottom-6 right-3 md:right-6 ${
                 mapExpanded
-                  ? "w-[calc(100vw-24px)] sm:w-[500px] h-[320px] sm:h-[400px]"
-                  : "w-[240px] h-[160px] sm:w-[320px] sm:h-[240px]"
+                  ? "w-[calc(100vw-24px)] md:w-[500px] h-[320px] md:h-[400px]"
+                  : hasGuessed
+                  ? "w-[calc(100vw-24px)] md:w-[320px] h-auto md:h-[240px]"
+                  : "w-[240px] h-[160px] md:w-[320px] md:h-[240px]"
               } group shadow-2xl hover:border-blue-500/30 border border-white/10 bg-slate-50 dark:bg-slate-900/90 rounded-2xl overflow-hidden p-1.5`
         }`}
         onMouseEnter={() => !isMapFullscreen && setMapExpanded(true)}
@@ -360,7 +372,7 @@ export default function DailyGamePage() {
                   e.stopPropagation();
                   setPeekPhoto(!peekPhoto);
                 }}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-dark text-white font-bold text-xs hover:bg-white/15 transition-all border border-white/10 cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl glass-dark text-white font-bold text-xs hover:bg-white/15 transition-all border border-white/10 cursor-pointer min-h-[44px]"
               >
                 <Eye className="h-4 w-4 text-blue-400" />
                 <span>{peekPhoto ? "Hide Photo" : "Peek Photo"}</span>
@@ -373,18 +385,18 @@ export default function DailyGamePage() {
                   e.preventDefault();
                   setIsMapFullscreen(false);
                 }}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 active:bg-orange-700 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl border border-orange-500/30 cursor-pointer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-orange-600 active:bg-orange-700 hover:bg-orange-700 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-xl border border-orange-500/30 cursor-pointer min-h-[44px]"
               >
                 <X className="h-4 w-4" /> Close Map
               </button>
             </div>
           ) : (
             /* Floating mode controls */
-            <div className="absolute top-3 right-3 z-[1002]">
+            <div className={`absolute top-3 right-3 z-[1002] ${hasGuessed ? "hidden md:block" : "block"}`}>
               <button
                 type="button"
                 onClick={() => setIsMapFullscreen(true)}
-                className="p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg"
+                className="p-2 rounded-lg glass-dark text-white border border-white/10 hover:bg-white/15 transition-colors shadow-lg min-h-[36px] min-w-[36px] flex items-center justify-center"
                 title="Fullscreen Map"
               >
                 <Maximize2 className="h-3.5 w-3.5" />
@@ -423,7 +435,7 @@ export default function DailyGamePage() {
           )}
 
           {/* Map view */}
-          <div className="flex-1 relative min-h-0">
+          <div className={`flex-1 relative min-h-0 ${hasGuessed && !mapExpanded && !isMapFullscreen ? "hidden md:block" : "block"}`}>
             <DynamicMap
               onMapClick={handleMapClick}
               userGuess={userGuess}
@@ -451,7 +463,7 @@ export default function DailyGamePage() {
                 <button
                   onClick={handleGuess}
                   disabled={!userGuess}
-                  className="px-6 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
+                  className="min-h-[44px] min-w-[44px] px-6 py-2.5 md:py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer flex items-center justify-center"
                 >
                   Guess
                 </button>
@@ -459,14 +471,14 @@ export default function DailyGamePage() {
             ) : (
               /* If has guessed, show daily results and sharing action */
               <div className="flex flex-col gap-2.5">
-                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5 pr-8 sm:pr-0">
+                <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Distance Off</span>
                     <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
                       {distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(2)}km`}
                     </span>
                   </div>
-                  <div className="flex flex-col items-end">
+                  <div className="flex flex-col items-end text-right">
                     <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Score Earned</span>
                     <span className="font-black text-xs sm:text-base text-amber-600 dark:text-yellow-400">
                       {score.toLocaleString()} / 5,000 pts
@@ -481,7 +493,7 @@ export default function DailyGamePage() {
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className="flex items-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
+                      className="flex items-center justify-center gap-1 min-h-[44px] px-3.5 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
                     >
                       {copied ? (
                         <>
@@ -495,7 +507,7 @@ export default function DailyGamePage() {
                     </button>
                     <Link
                       href="/"
-                      className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-800 dark:text-gray-200 font-bold text-[11px] sm:text-xs border border-white/10"
+                      className="flex items-center justify-center min-h-[44px] px-3 sm:px-3.5 py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-800 dark:text-gray-200 font-bold text-[11px] sm:text-xs border border-white/10"
                     >
                       Home
                     </Link>

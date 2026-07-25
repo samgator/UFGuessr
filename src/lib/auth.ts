@@ -3,15 +3,24 @@ import bcrypt from "bcryptjs";
 import { NextRequest } from "next/server";
 import { prisma } from "./db";
 
-const JWT_SECRET = process.env.JWT_SECRET || "ufguessr_default_super_secret_key_123456";
+export function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn("[Security Warning] JWT_SECRET environment variable is missing. Configure JWT_SECRET in production.");
+    }
+    return "ufguessr_default_fallback_secret_key_123456";
+  }
+  return secret;
+}
 
 export function signToken(payload: { userId: number; username: string }): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: "1d" });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "1d" });
 }
 
 export function verifyToken(token: string): { userId: number; username: string } | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as { userId: number; username: string };
+    return jwt.verify(token, getJwtSecret()) as { userId: number; username: string };
   } catch {
     return null;
   }
