@@ -117,19 +117,19 @@ export default function ArchiveGamePage() {
     const maxPossible = locations.length * 5000;
     const ratio = score / maxPossible;
 
-    if (ratio >= 0.9) return { text: "Amazing job! Your knowledge of the campus layout is absolute perfection.", color: "text-orange-500 font-extrabold" };
-    if (ratio >= 0.7) return { text: "Excellent layout knowledge! You walk with standard Gator pride.", color: "text-blue-500 font-bold" };
-    if (ratio >= 0.4) return { text: "Pretty good! You found your way around campus comfortably.", color: "text-emerald-500 font-semibold" };
-    return { text: "A good effort! Grab a campus map and try playing another session.", color: "text-gray-500 dark:text-gray-400 font-medium" };
+    if (ratio >= 0.9) return { text: "Amazing job! Your knowledge of the campus layout is absolute perfection.", color: "text-orange-700 dark:text-orange-400 font-extrabold" };
+    if (ratio >= 0.7) return { text: "Excellent layout knowledge! You walk with standard Gator pride.", color: "text-blue-600 dark:text-blue-400 font-bold" };
+    if (ratio >= 0.4) return { text: "Pretty good! You found your way around campus comfortably.", color: "text-emerald-700 dark:text-emerald-400 font-semibold" };
+    return { text: "A good effort! Grab a campus map and try playing another session.", color: "text-gray-600 dark:text-gray-300 font-medium" };
   };
 
   if (loading) {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl flex flex-col items-center gap-4 text-center">
-          <Loader2 className="animate-spin h-10 w-10 text-blue-500" />
+          <Loader2 className="animate-spin h-10 w-10 text-blue-600 dark:text-blue-400" />
           <h2 className="text-xl font-bold">Assembling UF Campus...</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Selecting landmarks and rendering the map.
           </p>
         </div>
@@ -141,9 +141,9 @@ export default function ArchiveGamePage() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl text-center flex flex-col gap-4">
-          <HelpCircle className="h-12 w-12 text-orange-500 mx-auto" />
+          <HelpCircle className="h-12 w-12 text-orange-600 dark:text-orange-400 mx-auto" />
           <h2 className="text-xl font-bold">No Landmarks Available</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             The standard location backlog is empty. Please contact an admin to seed or upload campus photos.
           </p>
           <Link href="/" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all">
@@ -164,14 +164,14 @@ export default function ArchiveGamePage() {
       <div className="flex-1 w-full flex flex-col items-center p-4 sm:p-8 max-w-6xl mx-auto gap-6">
         {/* Header Summary */}
         <div className="glass-card w-full p-6 sm:p-8 rounded-2xl text-center flex flex-col items-center gap-3">
-          <Trophy className="h-14 w-14 text-yellow-500 animate-bounce" />
+          <Trophy className="h-14 w-14 text-amber-500 animate-bounce" />
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Game Completed!</h1>
           
           <div className="mt-2 flex flex-col items-center">
             <span className="text-5xl font-black bg-gradient-to-r from-blue-500 to-orange-500 bg-clip-text text-transparent">
               {totalScore.toLocaleString()}
             </span>
-            <span className="text-xs text-gray-500 font-bold tracking-widest mt-1">TOTAL POINTS OUT OF {locations.length * 5000}</span>
+            <span className="text-xs text-gray-600 dark:text-gray-300 font-bold tracking-widest mt-1">TOTAL POINTS OUT OF {locations.length * 5000}</span>
           </div>
 
           <div className="mt-4 border-t border-white/10 pt-4 max-w-lg">
@@ -200,10 +200,10 @@ export default function ArchiveGamePage() {
           <div className="glass-card rounded-2xl overflow-hidden flex flex-col h-[400px] lg:h-auto min-h-[350px]">
             <div className="p-4 border-b border-white/10 flex items-center justify-between">
               <span className="font-bold text-sm flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-blue-500" />
+                <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 Game Map Summary
               </span>
-              <span className="text-xs text-gray-500">All 5 rounds plotted</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">All 5 rounds plotted</span>
             </div>
             <div className="flex-1 relative">
               {/* Plot all 5 markers on a custom summary map */}
@@ -243,22 +243,22 @@ export default function ArchiveGamePage() {
                 {/* Text Data */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 mb-0.5">
-                    <span className="text-xs font-extrabold bg-blue-500/10 text-blue-500 dark:text-blue-400 px-2 py-0.5 rounded-full">
+                    <span className="text-xs font-extrabold bg-blue-500/10 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full">
                       Round {idx + 1}
                     </span>
                     <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
                       round.location.difficulty === "easy"
-                        ? "bg-emerald-500/10 text-emerald-500"
+                        ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
                         : round.location.difficulty === "medium"
-                        ? "bg-yellow-500/10 text-yellow-500"
-                        : "bg-red-500/10 text-red-500"
+                        ? "bg-amber-500/10 text-amber-700 dark:text-yellow-400"
+                        : "bg-red-500/10 text-red-700 dark:text-red-400"
                     }`}>
                       {round.location.difficulty}
                     </span>
                   </div>
                   <h3 className="font-bold text-sm truncate">{round.location.name}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    By: <span className="font-medium text-slate-700 dark:text-slate-300">{round.location.uploader || "Anonymous"}</span> • Distance: <span className="font-semibold text-slate-800 dark:text-slate-200">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+                    By: <span className="font-medium text-slate-800 dark:text-slate-200">{round.location.uploader || "Anonymous"}</span> • Distance: <span className="font-semibold text-slate-900 dark:text-slate-100">
                       {round.distance < 1000 ? `${Math.round(round.distance)}m` : `${(round.distance / 1000).toFixed(2)}km`}
                     </span>
                   </p>
@@ -269,7 +269,7 @@ export default function ArchiveGamePage() {
                   <span className="font-black text-xl text-blue-600 dark:text-blue-400">
                     {round.score}
                   </span>
-                  <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">points</span>
+                  <span className="text-[9px] text-gray-600 dark:text-gray-400 font-bold uppercase tracking-wider">points</span>
                 </div>
               </div>
             ))}
@@ -461,21 +461,20 @@ export default function ArchiveGamePage() {
             <DynamicMap
               onMapClick={handleMapClick}
               userGuess={userGuess}
-              actualLocation={hasGuessed ? [currentLoc.latitude, currentLoc.longitude] : null}
+                  actualLocation={hasGuessed ? [currentLoc.latitude, currentLoc.longitude] : null}
               showResult={hasGuessed}
               readonly={hasGuessed}
               isMapFullscreen={isMapFullscreen}
             />
           </div>
-
           {/* Control Bar: Pin placement & Guess action */}
           <div className="p-3 bg-white/95 dark:bg-slate-900/95 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2 rounded-b-xl z-[1001]">
             {/* If has not guessed, show guess validation status or guide */}
             {!hasGuessed ? (
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
                   {userGuess ? (
-                    <span className="text-emerald-500 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
                       <Check className="h-3.5 w-3.5" /> Pin dropped
                     </span>
                   ) : (
@@ -485,41 +484,48 @@ export default function ArchiveGamePage() {
                 <button
                   onClick={handleGuess}
                   disabled={!userGuess}
-                  className="px-6 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
+                  className="px-6 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
                 >
                   Guess
                 </button>
               </div>
             ) : (
-              /* If has guessed, show round metrics and action buttons */
+              /* If has guessed, show round results and next round action */
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5 pr-8 sm:pr-0">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Distance Off</span>
-                    <span className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-white">
-                      {roundResult && roundResult.distance < 1000
+                    <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Distance Off</span>
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
+                      {roundResult?.distance && roundResult.distance < 1000
                         ? `${Math.round(roundResult.distance)}m`
-                        : `${(roundResult!.distance / 1000).toFixed(2)}km`}
+                        : `${((roundResult?.distance || 0) / 1000).toFixed(2)}km`}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Earned Score</span>
-                    <span className="font-black text-xs sm:text-base text-emerald-500 dark:text-emerald-400">
+                    <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Earned Score</span>
+                    <span className="font-black text-xs sm:text-base text-emerald-700 dark:text-emerald-400">
                       +{roundResult?.score} pts
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={`${currentLoc.name} (Photo by ${currentLoc.uploader || "Anonymous"})`}>
-                    {currentLoc.name} <span className="font-normal text-gray-400 dark:text-gray-500">• Photo by {currentLoc.uploader || "Anonymous"}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-700 dark:text-gray-200 min-w-0 flex-1 truncate" title={`${currentLoc.name} (Photo by ${currentLoc.uploader || "Anonymous"})`}>
+                    {currentLoc.name} <span className="font-normal text-gray-600 dark:text-gray-400">• Photo by {currentLoc.uploader || "Anonymous"}</span>
                   </div>
                   <button
                     onClick={handleNextRound}
-                    className="flex-shrink-0 flex items-center gap-1 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer"
+                    className="flex items-center gap-1 px-4.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/10 cursor-pointer flex-shrink-0"
                   >
-                    {currentRound < locations.length - 1 ? "Next Round" : "View Summary"}
-                    <ChevronRight className="h-3.5 w-3.5" />
+                    {currentRound < locations.length - 1 ? (
+                      <>
+                        Next Round <ChevronRight className="h-3.5 w-3.5" />
+                      </>
+                    ) : (
+                      <>
+                        View Results <Trophy className="h-3.5 w-3.5 text-yellow-400" />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

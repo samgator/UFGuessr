@@ -175,9 +175,9 @@ export default function DailyGamePage() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl flex flex-col items-center gap-4 text-center">
-          <Loader2 className="animate-spin h-10 w-10 text-blue-500" />
+          <Loader2 className="animate-spin h-10 w-10 text-blue-600 dark:text-blue-400" />
           <h2 className="text-xl font-bold">Querying The Queue...</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Fetching today&apos;s campus location.
           </p>
         </div>
@@ -194,17 +194,17 @@ export default function DailyGamePage() {
           {/* Construction Stripes Border */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-yellow-500 via-slate-950 to-yellow-500 bg-[length:40px_100%] animate-[dash_2s_linear_infinite]" />
           
-          <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-full text-yellow-500 animate-pulse mt-4">
+          <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-full text-amber-500 dark:text-yellow-400 animate-pulse mt-4">
             <Construction className="h-14 w-14" />
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 rounded-full text-xs font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500/10 text-amber-600 dark:text-yellow-400 border border-yellow-500/20 rounded-full text-xs font-bold uppercase tracking-wider">
             <Lock className="h-3 w-3" /> Under Construction
           </div>
 
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-extrabold tracking-tight">Daily Game Mode is Locked</h1>
-            <p className="text-sm text-gray-400 max-w-md mx-auto leading-relaxed">
+            <p className="text-sm text-gray-300 max-w-md mx-auto leading-relaxed">
               We are currently working on uploading more daily locations.
               Check back soon for the Daily!
             </p>
@@ -233,9 +233,9 @@ export default function DailyGamePage() {
     return (
       <div className="flex-1 w-full flex flex-col items-center justify-center p-8">
         <div className="glass-card max-w-md w-full p-8 rounded-2xl text-center flex flex-col gap-4">
-          <HelpCircle className="h-12 w-12 text-orange-500 mx-auto" />
+          <HelpCircle className="h-12 w-12 text-orange-600 dark:text-orange-400 mx-auto" />
           <h2 className="text-xl font-bold">No Daily Game Available</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             No active queue item found for today, and database has no fallback locations.
           </p>
           <Link href="/" className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all">
@@ -439,9 +439,9 @@ export default function DailyGamePage() {
             {/* If has not guessed, show guess validation status or guide */}
             {!hasGuessed ? (
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
                   {userGuess ? (
-                    <span className="text-emerald-500 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-1">
                       <Check className="h-3.5 w-3.5" /> Pin dropped
                     </span>
                   ) : (
@@ -451,7 +451,7 @@ export default function DailyGamePage() {
                 <button
                   onClick={handleGuess}
                   disabled={!userGuess}
-                  className="px-6 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
+                  className="px-6 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 dark:disabled:bg-slate-800 disabled:text-gray-500 dark:disabled:text-gray-600 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md disabled:shadow-none cursor-pointer"
                 >
                   Guess
                 </button>
@@ -461,22 +461,22 @@ export default function DailyGamePage() {
               <div className="flex flex-col gap-2.5">
                 <div className="flex items-center justify-between border-b border-gray-100 dark:border-white/5 pb-2.5 pr-8 sm:pr-0">
                   <div className="flex flex-col">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Distance Off</span>
-                    <span className="font-extrabold text-xs sm:text-sm text-slate-800 dark:text-white">
+                    <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Distance Off</span>
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
                       {distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(2)}km`}
                     </span>
                   </div>
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Score Earned</span>
-                    <span className="font-black text-xs sm:text-base text-yellow-500">
+                    <span className="text-[10px] text-gray-600 dark:text-gray-300 uppercase font-bold tracking-wider">Score Earned</span>
+                    <span className="font-black text-xs sm:text-base text-amber-600 dark:text-yellow-400">
                       {score.toLocaleString()} / 5,000 pts
                     </span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={`${location.name} (Photo by ${location.uploader || "Anonymous"})`}>
-                    {location.name} <span className="font-normal text-gray-400 dark:text-gray-500">• Photo by {location.uploader || "Anonymous"}</span>
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-700 dark:text-gray-200 min-w-0 flex-1 truncate" title={`${location.name} (Photo by ${location.uploader || "Anonymous"})`}>
+                    {location.name} <span className="font-normal text-gray-600 dark:text-gray-400">• Photo by {location.uploader || "Anonymous"}</span>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button
@@ -495,7 +495,7 @@ export default function DailyGamePage() {
                     </button>
                     <Link
                       href="/"
-                      className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300 font-bold text-[11px] sm:text-xs border border-white/10"
+                      className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl glass hover:bg-white/10 dark:hover:bg-white/5 text-slate-800 dark:text-gray-200 font-bold text-[11px] sm:text-xs border border-white/10"
                     >
                       Home
                     </Link>
