@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import L from "leaflet";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Polyline,
+  Popup,
   useMapEvents,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { UF_CAMPUS_CENTER, UF_CAMPUS_BOUNDS } from "@/lib/geo";
+import { SummaryRound } from "./DynamicMap";
 
 // Resolve Next.js Leaflet default marker icon path issue
 const fixLeafletIcon = () => {
@@ -57,22 +59,34 @@ function MapRecenter({
   userGuess,
   actualLocation,
   showResult,
+  summaryRounds,
 }: {
   userGuess?: [number, number] | null;
   actualLocation?: [number, number] | null;
   showResult: boolean;
+  summaryRounds?: SummaryRound[] | null;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (showResult && userGuess && actualLocation) {
+    if (summaryRounds && summaryRounds.length > 0) {
+      const points: [number, number][] = [];
+      summaryRounds.forEach((r) => {
+        if (r.guess) points.push(r.guess);
+        if (r.actualLocation) points.push(r.actualLocation);
+      });
+      if (points.length > 0) {
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 17 });
+      }
+    } else if (showResult && userGuess && actualLocation) {
       const bounds = L.latLngBounds([userGuess, actualLocation]);
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 17 });
     } else if (!showResult && !userGuess && actualLocation) {
       // Admin editing recenter
       map.setView(actualLocation, 16);
     }
-  }, [userGuess, actualLocation, showResult, map]);
+  }, [userGuess, actualLocation, showResult, summaryRounds, map]);
 
   return null;
 }
@@ -120,6 +134,7 @@ interface GameMapProps {
   showResult?: boolean;
   readonly?: boolean;
   isMapFullscreen?: boolean;
+  summaryRounds?: SummaryRound[] | null;
 }
 
 export default function GameMap({
@@ -129,6 +144,7 @@ export default function GameMap({
   showResult = false,
   readonly = false,
   isMapFullscreen = false,
+  summaryRounds,
 }: GameMapProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -174,37 +190,76 @@ export default function GameMap({
 
         <MapClickHandler onClick={onMapClick} enabled={!readonly && !showResult} />
 
-        {/* User's guess marker */}
-        {userGuess && (
-          <Marker
-            position={userGuess}
-            icon={showResult ? redIcon : blueIcon}
-          />
-        )}
+        {/* Render summary rounds if provided */}
+        {summaryRounds && summaryRounds.length > 0 ? (
+          summaryRounds.map((round, index) => (
+            <React.Fragment key={index}>
+              {/* User guess marker */}
+              <Marker position={round.guess} icon={redIcon}>
+                <Popup>
+                  <div className="text-xs font-semibold text-slate-800">
+                    <span className="font-extrabold text-red-600">Round {round.roundNumber || index + 1} Guess</span>
+                    {round.locationName && <div className="text-[11px] text-gray-500 font-medium">{round.locationName}</div>}
+                  </div>
+                </Popup>
+              </Marker>
 
-        {/* Actual target location marker */}
-        {showResult && actualLocation && (
-          <Marker
-            position={actualLocation}
-            icon={greenIcon}
-          />
-        )}
+              {/* Actual target location marker */}
+              <Marker position={round.actualLocation} icon={greenIcon}>
+                <Popup>
+                  <div className="text-xs font-semibold text-slate-800">
+                    <span className="font-extrabold text-emerald-600">Round {round.roundNumber || index + 1} Target</span>
+                    {round.locationName && <div className="text-xs font-bold text-slate-900">{round.locationName}</div>}
+                  </div>
+                </Popup>
+              </Marker>
 
-        {/* Line connecting guess to actual */}
-        {showResult && userGuess && actualLocation && (
-          <Polyline
-            positions={[userGuess, actualLocation]}
-            color="#3b82f6"
-            weight={4}
-            dashArray="10, 10"
-            className="animate-[dash_2s_linear_infinite]"
-          />
+              {/* Connecting line */}
+              <Polyline
+                positions={[round.guess, round.actualLocation]}
+                color="#3b82f6"
+                weight={3}
+                dashArray="8, 8"
+                className="animate-[dash_2s_linear_infinite]"
+              />
+            </React.Fragment>
+          ))
+        ) : (
+          <>
+            {/* Single User's guess marker */}
+            {userGuess && (
+              <Marker
+                position={userGuess}
+                icon={showResult ? redIcon : blueIcon}
+              />
+            )}
+
+            {/* Single Actual target location marker */}
+            {showResult && actualLocation && (
+              <Marker
+                position={actualLocation}
+                icon={greenIcon}
+              />
+            )}
+
+            {/* Single Line connecting guess to actual */}
+            {showResult && userGuess && actualLocation && (
+              <Polyline
+                positions={[userGuess, actualLocation]}
+                color="#3b82f6"
+                weight={4}
+                dashArray="10, 10"
+                className="animate-[dash_2s_linear_infinite]"
+              />
+            )}
+          </>
         )}
 
         <MapRecenter
           userGuess={userGuess}
           actualLocation={actualLocation}
           showResult={showResult}
+          summaryRounds={summaryRounds}
         />
       </MapContainer>
     </div>

@@ -44,3 +44,17 @@ model Settings {
   key   String @unique
   value String
 }
+
+model DailyStat {
+  id           Int      @id @default(autoincrement())
+  date         String
+  locationId   Int?
+  locationName String?
+  score        Int
+  distance     Float
+  shared       Boolean  @default(false)
+  ipAddress    String?
+  userAgent    String?
+  completedAt  DateTime @default(now())
+}
+

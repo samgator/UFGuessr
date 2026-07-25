@@ -54,6 +54,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     const latitudeStr = formData.get("latitude")?.toString();
     const longitudeStr = formData.get("longitude")?.toString();
     const difficulty = formData.get("difficulty")?.toString();
+    const uploader = formData.get("uploader")?.toString();
     const imageFile = formData.get("image") as File | null;
     const externalImageUrl = formData.get("externalImageUrl")?.toString();
 
@@ -82,6 +83,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       latitude: number;
       longitude: number;
       difficulty: string;
+      uploader?: string;
       imageUrl?: Buffer;
     } = {
       name,
@@ -89,6 +91,10 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       longitude,
       difficulty,
     };
+
+    if (uploader !== undefined) {
+      dataToUpdate.uploader = uploader || "Anonymous";
+    }
 
     if (imageFile && imageFile.name) {
       // Validate File Size

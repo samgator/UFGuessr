@@ -3,15 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, MapPin, Menu, X, Coffee } from "lucide-react";
+import { Sun, Moon, MapPin, Menu, X, Coffee, Settings, Zap, ZapOff, Check, Sliders } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme & reduced motion from localStorage or system preference
   useEffect(() => {
+    // Theme initialization
     const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
     const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const initialTheme = savedTheme || (systemPrefersDark ? "dark" : "light");
@@ -22,10 +25,21 @@ export default function Navbar() {
     } else {
       document.documentElement.classList.remove("dark");
     }
+
+    // Reduced motion initialization
+    const savedMotion = localStorage.getItem("reduced_motion");
+    const systemPrefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const initialMotion = savedMotion !== null ? savedMotion === "true" : systemPrefersReduced;
+
+    setReducedMotion(initialMotion);
+    if (initialMotion) {
+      document.documentElement.classList.add("reduce-motion");
+    } else {
+      document.documentElement.classList.remove("reduce-motion");
+    }
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
+  const handleThemeChange = (newTheme: "light" | "dark") => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     
@@ -36,6 +50,17 @@ export default function Navbar() {
     }
   };
 
+  const handleMotionChange = (isReduced: boolean) => {
+    setReducedMotion(isReduced);
+    localStorage.setItem("reduced_motion", isReduced ? "true" : "false");
+
+    if (isReduced) {
+      document.documentElement.classList.add("reduce-motion");
+    } else {
+      document.documentElement.classList.remove("reduce-motion");
+    }
+  };
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Archive Mode", href: "/game/archive" },
@@ -43,130 +68,268 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 glass w-full border-b border-white/10 px-4 py-3 sm:px-8 grid grid-cols-2 md:grid-cols-3 items-center shadow-lg">
-      {/* Brand Logo */}
-      <div className="flex justify-start">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="bg-gradient-to-tr from-blue-600 to-orange-500 p-2 rounded-xl text-white shadow-md transform group-hover:scale-105 transition-transform duration-200">
-            <MapPin className="h-5 w-5" />
-          </div>
-          <span className="font-black text-xl tracking-tight bg-gradient-to-r from-blue-600 via-blue-500 to-orange-500 dark:from-blue-400 dark:to-orange-400 bg-clip-text text-transparent">
-            UFGuessr
-          </span>
-        </Link>
-      </div>
-
-      {/* Desktop Links - Perfectly Centered */}
-      <div className="hidden md:flex items-center justify-center gap-6">
-        {navLinks.map((link) => {
-          const isActive = pathname === link.href;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-sm font-semibold transition-colors duration-200 relative py-1 ${
-                isActive
-                  ? "text-blue-600 dark:text-blue-400"
-                  : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
-              }`}
-            >
-              {link.name}
-              {isActive && (
-                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full" />
-              )}
-            </Link>
-          );
-        })}
-      </div>
-
-      {/* Theme Toggler (Desktop) & Mobile Actions (Mobile) */}
-      <div className="flex justify-end items-center gap-2.5">
-        {/* Desktop Buy Me A Coffee */}
-        <div className="hidden md:block">
-          <a
-            href="https://www.paypal.com/paypalme/samuelmorsics"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3.5 py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm"
-            aria-label="Buy Me A Coffee"
-          >
-            <Coffee className="h-4 w-4 text-amber-500 dark:text-yellow-400" />
-            <span>Buy Me a Coffee</span>
-          </a>
+    <>
+      <nav className="sticky top-0 z-50 glass w-full border-b border-white/10 px-4 py-3 sm:px-8 grid grid-cols-2 md:grid-cols-3 items-center shadow-lg">
+        {/* Brand Logo */}
+        <div className="flex justify-start">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="bg-gradient-to-tr from-blue-600 to-orange-500 p-2 rounded-xl text-white shadow-md transform group-hover:scale-105 transition-transform duration-200">
+              <MapPin className="h-5 w-5" />
+            </div>
+            <span className="font-black text-xl tracking-tight bg-gradient-to-r from-blue-600 via-blue-500 to-orange-500 dark:from-blue-400 dark:to-orange-400 bg-clip-text text-transparent">
+              UFGuessr
+            </span>
+          </Link>
         </div>
 
-        {/* Desktop Theme Toggler */}
-        <div className="hidden md:block">
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 text-gray-600 dark:text-gray-300 hover:text-orange-500 dark:hover:text-yellow-400"
-            aria-label="Toggle Theme"
-          >
-            {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </button>
-        </div>
-
-        {/* Mobile Actions */}
-        <div className="flex md:hidden items-center gap-2">
-          {/* Mobile Buy Me A Coffee */}
-          <a
-            href="https://www.paypal.com/paypalme/samuelmorsics"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-2.5 py-1.5 rounded-lg glass text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-1.5 text-xs font-bold"
-            aria-label="Buy Me A Coffee"
-          >
-            <Coffee className="h-3.5 w-3.5 text-amber-500 dark:text-yellow-400" />
-            <span className="hidden xs:inline sm:inline">Buy Me a Coffee</span>
-          </a>
-
-          <button
-            onClick={toggleTheme}
-            className="p-1.5 rounded-lg glass text-gray-600 dark:text-gray-300"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-lg glass text-gray-600 dark:text-gray-300"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-white dark:bg-[#0b1329] border-b border-gray-200 dark:border-white/10 shadow-2xl flex flex-col p-4 gap-3 md:hidden z-50">
+        {/* Desktop Links - Perfectly Centered */}
+        <div className="hidden md:flex items-center justify-center gap-6">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`text-sm font-semibold p-2.5 rounded-xl transition-all ${
+                className={`text-sm font-semibold transition-colors duration-200 relative py-1 ${
                   isActive
-                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
+                    ? "text-blue-600 dark:text-blue-400"
+                    : "text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
                 }`}
               >
                 {link.name}
+                {isActive && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-orange-500 rounded-full" />
+                )}
               </Link>
             );
           })}
-          <a
-            href="https://www.paypal.com/paypalme/samuelmorsics"
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setMobileMenuOpen(false)}
-            className="text-sm font-semibold p-2.5 rounded-xl text-amber-600 dark:text-yellow-400 bg-amber-500/10 border border-amber-500/20 flex items-center gap-2"
-          >
-            <Coffee className="h-4 w-4" />
-            <span>Buy Me a Coffee</span>
-          </a>
+        </div>
+
+        {/* Header Action Buttons (Desktop & Mobile) */}
+        <div className="flex justify-end items-center gap-2.5">
+          {/* Desktop Buy Me A Coffee */}
+          <div className="hidden md:block">
+            <a
+              href="https://www.paypal.com/paypalme/samuelmorsics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm"
+              aria-label="Buy Me A Coffee"
+            >
+              <Coffee className="h-4 w-4 text-amber-500 dark:text-yellow-400" />
+              <span>Buy Me a Coffee</span>
+            </a>
+          </div>
+
+          {/* Desktop Settings Button */}
+          <div className="hidden md:block">
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="px-3.5 py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm cursor-pointer"
+              aria-label="Open Settings"
+            >
+              <Settings className="h-4 w-4 text-blue-500 dark:text-blue-400" />
+              <span>Settings</span>
+            </button>
+          </div>
+
+          {/* Mobile Actions */}
+          <div className="flex md:hidden items-center gap-2">
+            {/* Mobile Buy Me A Coffee */}
+            <a
+              href="https://www.paypal.com/paypalme/samuelmorsics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1.5 rounded-lg glass text-gray-700 dark:text-gray-200 hover:text-amber-600 dark:hover:text-yellow-400 flex items-center gap-1.5 text-xs font-bold"
+              aria-label="Buy Me A Coffee"
+            >
+              <Coffee className="h-3.5 w-3.5 text-amber-500 dark:text-yellow-400" />
+              <span className="hidden xs:inline sm:inline">Buy Me a Coffee</span>
+            </a>
+
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="p-2 rounded-lg glass text-gray-600 dark:text-gray-300 hover:text-blue-500"
+              aria-label="Open Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </button>
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-1.5 rounded-lg glass text-gray-600 dark:text-gray-300"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div className="absolute top-16 left-0 right-0 bg-white dark:bg-[#0b1329] border-b border-gray-200 dark:border-white/10 shadow-2xl flex flex-col p-4 gap-3 md:hidden z-50">
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`text-sm font-semibold p-2.5 rounded-xl transition-all ${
+                    isActive
+                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setSettingsOpen(true);
+              }}
+              className="text-sm font-semibold p-2.5 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/5 flex items-center gap-2 text-left"
+            >
+              <Settings className="h-4 w-4 text-blue-500" />
+              <span>Settings & Preferences</span>
+            </button>
+            <a
+              href="https://www.paypal.com/paypalme/samuelmorsics"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-sm font-semibold p-2.5 rounded-xl text-amber-600 dark:text-yellow-400 bg-amber-500/10 border border-amber-500/20 flex items-center gap-2"
+            >
+              <Coffee className="h-4 w-4" />
+              <span>Buy Me a Coffee</span>
+            </a>
+          </div>
+        )}
+      </nav>
+
+      {/* Settings Modal */}
+      {settingsOpen && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="glass-card max-w-md w-full p-6 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-6 relative bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-blue-500/10 text-blue-500 dark:text-blue-400 border border-blue-500/20">
+                  <Sliders className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-extrabold tracking-tight">App Preferences</h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Customize theme and performance</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSettingsOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+                aria-label="Close Settings"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex flex-col gap-5">
+              
+              {/* Section 1: Appearance Theme */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                  Appearance Theme
+                </label>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed -mt-1">
+                  Select your preferred visual interface color mode.
+                </p>
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange("light")}
+                    className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold border transition-all cursor-pointer ${
+                      theme === "light"
+                        ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border-blue-500/50 shadow-md ring-2 ring-blue-500/20"
+                        : "bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <Sun className="h-4 w-4 text-amber-500" />
+                    <span>Light Mode</span>
+                    {theme === "light" && <Check className="h-3.5 w-3.5 ml-auto" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange("dark")}
+                    className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold border transition-all cursor-pointer ${
+                      theme === "dark"
+                        ? "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border-blue-500/50 shadow-md ring-2 ring-blue-500/20"
+                        : "bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <Moon className="h-4 w-4 text-blue-400" />
+                    <span>Dark Mode</span>
+                    {theme === "dark" && <Check className="h-3.5 w-3.5 ml-auto" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Section 2: Motion & Performance */}
+              <div className="flex flex-col gap-2 border-t border-gray-200 dark:border-white/10 pt-4">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                  Motion & Performance
+                </label>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed -mt-1">
+                  Reduce animations and visual transitions for lower latency on budget devices or accessibility needs.
+                </p>
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleMotionChange(false)}
+                    className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold border transition-all cursor-pointer ${
+                      !reducedMotion
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/50 shadow-md ring-2 ring-emerald-500/20"
+                        : "bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <Zap className="h-4 w-4 text-yellow-500" />
+                    <span>Full Motion</span>
+                    {!reducedMotion && <Check className="h-3.5 w-3.5 ml-auto" />}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleMotionChange(true)}
+                    className={`py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold border transition-all cursor-pointer ${
+                      reducedMotion
+                        ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-500/50 shadow-md ring-2 ring-emerald-500/20"
+                        : "bg-gray-50 dark:bg-slate-800/50 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
+                    <ZapOff className="h-4 w-4 text-orange-400" />
+                    <span>Reduce Motion</span>
+                    {reducedMotion && <Check className="h-3.5 w-3.5 ml-auto" />}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Modal Footer */}
+            <div className="border-t border-gray-200 dark:border-white/10 pt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSettingsOpen(false)}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
-    </nav>
+    </>
   );
 }

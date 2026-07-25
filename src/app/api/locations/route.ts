@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     const latitudeStr = formData.get("latitude")?.toString();
     const longitudeStr = formData.get("longitude")?.toString();
     const difficulty = formData.get("difficulty")?.toString();
+    const uploader = formData.get("uploader")?.toString() || "Anonymous";
     const imageFile = formData.get("image") as File | null;
     const externalImageUrl = formData.get("externalImageUrl")?.toString();
 
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
         longitude,
         imageUrl: imageBuffer,
         difficulty,
+        uploader,
       },
     });
 

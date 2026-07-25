@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDistanceInMeters, calculateScore } from "@/lib/geo";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Eye, X, Loader2 } from "lucide-react";
+import { MapPin, Trophy, Share2, Check, Construction, ArrowRight, HelpCircle, Lock, Maximize2, Eye, X, Loader2, Camera } from "lucide-react";
 
 interface Location {
   id: number;
@@ -14,6 +14,7 @@ interface Location {
   longitude: number;
   imageUrl: string;
   difficulty: string;
+  uploader?: string | null;
 }
 
 export default function DailyGamePage() {
@@ -29,6 +30,8 @@ export default function DailyGamePage() {
   const [mapExpanded, setMapExpanded] = useState(false);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [peekPhoto, setPeekPhoto] = useState(false);
+  const [statId, setStatId] = useState<number | null>(null);
+  const [hasShared, setHasShared] = useState(false);
 
   // Load Daily Game State
   const fetchDailyGame = async () => {
@@ -56,6 +59,8 @@ export default function DailyGamePage() {
           setHasGuessed(true);
           setScore(parsed.score);
           setDistance(parsed.distance);
+          if (parsed.statId) setStatId(parsed.statId);
+          if (parsed.shared) setHasShared(true);
         }
       }
     } catch (err) {
@@ -75,7 +80,7 @@ export default function DailyGamePage() {
     }
   };
 
-  const handleGuess = () => {
+  const handleGuess = async () => {
     if (!userGuess || hasGuessed || !location || !dateStr) return;
 
     const dist = getDistanceInMeters(
@@ -91,6 +96,31 @@ export default function DailyGamePage() {
     setScore(calculatedScore);
     setHasGuessed(true);
 
+    let newStatId: number | null = null;
+    try {
+      const res = await fetch("/api/game/daily/stats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: dateStr,
+          score: calculatedScore,
+          distance: dist,
+          locationId: location.id,
+          locationName: location.name,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.statId) {
+          newStatId = data.statId;
+          setStatId(data.statId);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to log daily stat:", err);
+    }
+
     // Persist result in localStorage to block multiple submissions
     localStorage.setItem(
       `ufguessr_daily_${dateStr}`,
@@ -99,11 +129,13 @@ export default function DailyGamePage() {
         score: calculatedScore,
         distance: dist,
         date: dateStr,
+        statId: newStatId,
+        shared: false,
       })
     );
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!location) return;
     const formattedDistance = distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(2)}km`;
     const shareText = `UFGuessr Daily Challenge 🐊 (${dateStr})\n📍 Distance: ${formattedDistance} off\n🏆 Score: ${score.toLocaleString()} / 5,000 pts!\n\nCan you beat me? Play now: ${window.location.origin}/game/daily`;
@@ -112,6 +144,31 @@ export default function DailyGamePage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+
+    if (!hasShared) {
+      setHasShared(true);
+      try {
+        await fetch("/api/game/daily/stats", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            statId: statId || undefined,
+            date: dateStr,
+          }),
+        });
+
+        const savedResult = localStorage.getItem(`ufguessr_daily_${dateStr}`);
+        if (savedResult) {
+          const parsed = JSON.parse(savedResult);
+          localStorage.setItem(
+            `ufguessr_daily_${dateStr}`,
+            JSON.stringify({ ...parsed, shared: true })
+          );
+        }
+      } catch (err) {
+        console.error("Failed to update share stat:", err);
+      }
+    }
   };
 
   if (loading) {
@@ -219,6 +276,10 @@ export default function DailyGamePage() {
             </span>
           </div>
           <h2 className="text-lg sm:text-2xl font-black mt-1">{dateStr}</h2>
+          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-300 font-medium">
+            <Camera className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+            <span>Photo by <span className="font-bold text-white">{location.uploader || "Anonymous"}</span></span>
+          </div>
           <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/10 text-sm font-semibold text-gray-300">
             <span>One attempt per day</span>
           </div>
@@ -346,6 +407,10 @@ export default function DailyGamePage() {
                   sizes="320px"
                   referrerPolicy="no-referrer"
                 />
+                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[11px] text-gray-200 flex items-center gap-1 pointer-events-none">
+                  <Camera className="h-3 w-3 text-blue-400" />
+                  <span>Photo by <span className="font-semibold text-white">{location.uploader || "Anonymous"}</span></span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setPeekPhoto(false)}
@@ -410,8 +475,8 @@ export default function DailyGamePage() {
                 </div>
 
                 <div className="flex items-center justify-between gap-2">
-                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={location.name}>
-                    {location.name}
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={`${location.name} (Photo by ${location.uploader || "Anonymous"})`}>
+                    {location.name} <span className="font-normal text-gray-400 dark:text-gray-500">• Photo by {location.uploader || "Anonymous"}</span>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button

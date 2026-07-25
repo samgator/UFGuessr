@@ -97,3 +97,20 @@ body {
   background: rgba(156, 163, 175, 0.7);
 }
 
+/* Reduced Motion & Low-End Device Performance Mode */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion .animate-spin,
+html.reduce-motion .animate-pulse,
+html.reduce-motion .animate-bounce,
+html.reduce-motion .animate-\[dash_2s_linear_infinite\] {
+  animation: none !important;
+}
+

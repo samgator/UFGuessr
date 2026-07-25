@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getDistanceInMeters, calculateScore } from "@/lib/geo";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Trophy, RefreshCw, ChevronRight, Maximize2, Check, HelpCircle, Eye, X, Loader2 } from "lucide-react";
+import { MapPin, Trophy, RefreshCw, ChevronRight, Maximize2, Check, HelpCircle, Eye, X, Loader2, Camera } from "lucide-react";
 
 interface Location {
   id: number;
@@ -14,6 +14,7 @@ interface Location {
   longitude: number;
   imageUrl: string;
   difficulty: string;
+  uploader?: string | null;
 }
 
 interface RoundResult {
@@ -209,9 +210,12 @@ export default function ArchiveGamePage() {
               <DynamicMap
                 readonly={true}
                 showResult={true}
-                // Draw connecting line between last guess to center so recenter works but customize behaviour below
-                userGuess={roundsHistory[0]?.guess}
-                actualLocation={roundsHistory[0]?.location ? [roundsHistory[0].location.latitude, roundsHistory[0].location.longitude] : null}
+                summaryRounds={roundsHistory.map((r, idx) => ({
+                  guess: r.guess,
+                  actualLocation: [r.location.latitude, r.location.longitude],
+                  locationName: r.location.name,
+                  roundNumber: idx + 1,
+                }))}
               />
             </div>
           </div>
@@ -254,7 +258,7 @@ export default function ArchiveGamePage() {
                   </div>
                   <h3 className="font-bold text-sm truncate">{round.location.name}</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Distance: <span className="font-semibold text-slate-800 dark:text-slate-200">
+                    By: <span className="font-medium text-slate-700 dark:text-slate-300">{round.location.uploader || "Anonymous"}</span> • Distance: <span className="font-semibold text-slate-800 dark:text-slate-200">
                       {round.distance < 1000 ? `${Math.round(round.distance)}m` : `${(round.distance / 1000).toFixed(2)}km`}
                     </span>
                   </p>
@@ -305,6 +309,10 @@ export default function ArchiveGamePage() {
             </span>
           </div>
           <h2 className="text-lg sm:text-2xl font-black mt-1">Round {currentRound + 1} of 5</h2>
+          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-gray-300 font-medium">
+            <Camera className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+            <span>Photo by <span className="font-bold text-white">{currentLoc.uploader || "Anonymous"}</span></span>
+          </div>
           <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-white/10 text-sm font-semibold">
             <Trophy className="h-4 w-4 text-yellow-400" />
             <span>Total Score: <span className="text-yellow-400 font-extrabold">{totalScore.toLocaleString()}</span></span>
@@ -433,6 +441,10 @@ export default function ArchiveGamePage() {
                   sizes="320px"
                   referrerPolicy="no-referrer"
                 />
+                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[11px] text-gray-200 flex items-center gap-1 pointer-events-none">
+                  <Camera className="h-3 w-3 text-blue-400" />
+                  <span>Photo by <span className="font-semibold text-white">{currentLoc.uploader || "Anonymous"}</span></span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setPeekPhoto(false)}
@@ -499,8 +511,8 @@ export default function ArchiveGamePage() {
                 </div>
 
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={currentLoc.name}>
-                    {currentLoc.name}
+                  <div className="text-[11px] sm:text-xs font-bold text-gray-600 dark:text-gray-300 min-w-0 flex-1 truncate" title={`${currentLoc.name} (Photo by ${currentLoc.uploader || "Anonymous"})`}>
+                    {currentLoc.name} <span className="font-normal text-gray-400 dark:text-gray-500">• Photo by {currentLoc.uploader || "Anonymous"}</span>
                   </div>
                   <button
                     onClick={handleNextRound}

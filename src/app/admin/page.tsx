@@ -23,6 +23,11 @@ import {
   Archive,
   Bell,
   Loader2,
+  User,
+  BarChart2,
+  Trophy,
+  Share2,
+  Activity,
 } from "lucide-react";
 
 interface Location {
@@ -45,6 +50,27 @@ interface QueueItem {
   location: Location;
 }
 
+interface DailyStat {
+  id: number;
+  date: string;
+  locationId?: number | null;
+  locationName?: string | null;
+  score: number;
+  distance: number;
+  shared: boolean;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  completedAt: string;
+}
+
+interface StatsSummary {
+  totalPlays: number;
+  totalShares: number;
+  avgScore: number;
+  avgDistance: number;
+  shareRate: number;
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [authenticated, setAuthenticated] = useState(false);
@@ -57,13 +83,22 @@ export default function AdminPage() {
   const [loginLoading, setLoginErrorLoading] = useState(false);
 
   // Admin Panel Tabs
-  const [activeTab, setActiveTab] = useState<"locations" | "queue" | "settings" | "submissions">("locations");
+  const [activeTab, setActiveTab] = useState<"locations" | "queue" | "settings" | "submissions" | "stats">("locations");
 
   // Data States
   const [locations, setLocations] = useState<Location[]>([]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [submissions, setSubmissions] = useState<Location[]>([]);
+  const [stats, setStats] = useState<DailyStat[]>([]);
+  const [statsSummary, setStatsSummary] = useState<StatsSummary>({
+    totalPlays: 0,
+    totalShares: 0,
+    avgScore: 0,
+    avgDistance: 0,
+    shareRate: 0,
+  });
+  const [statsFilter, setStatsFilter] = useState<"all" | "shared" | "unshared">("all");
 
   // CRUD Form Modal States
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -74,6 +109,7 @@ export default function AdminPage() {
   const [formLongitude, setFormLongitude] = useState("");
   const [formImageFile, setFormImageFile] = useState<File | null>(null);
   const [formExternalUrl, setFormExternalUrl] = useState("");
+  const [formUploader, setFormUploader] = useState("Anonymous");
   const [formError, setFormError] = useState("");
   const [formSubmitting, setFormSubmitting] = useState(false);
 
@@ -122,11 +158,12 @@ export default function AdminPage() {
 
   const loadDashboardData = async () => {
     try {
-      const [locsRes, queueRes, settingsRes, subsRes] = await Promise.all([
+      const [locsRes, queueRes, settingsRes, subsRes, statsRes] = await Promise.all([
         fetch("/api/locations"),
         fetch("/api/admin/queue"),
         fetch("/api/admin/settings"),
         fetch("/api/admin/submissions"),
+        fetch("/api/admin/stats"),
       ]);
 
       if (locsRes.ok) setLocations(await locsRes.json());
@@ -139,8 +176,43 @@ export default function AdminPage() {
         }
       }
       if (subsRes.ok) setSubmissions(await subsRes.json());
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setStats(statsData.stats || []);
+        if (statsData.summary) setStatsSummary(statsData.summary);
+      }
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
+    }
+  };
+
+  const handleDeleteStat = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this stat log entry?")) return;
+    try {
+      const res = await fetch(`/api/admin/stats?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        await loadDashboardData();
+      } else {
+        alert("Failed to delete stat entry.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting stat entry.");
+    }
+  };
+
+  const handleClearAllStats = async () => {
+    if (!confirm("ARE YOU SURE you want to clear all logged daily statistics? This action cannot be undone.")) return;
+    try {
+      const res = await fetch(`/api/admin/stats?clearAll=true`, { method: "DELETE" });
+      if (res.ok) {
+        await loadDashboardData();
+      } else {
+        alert("Failed to clear stats.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error clearing stats.");
     }
   };
 
@@ -200,6 +272,7 @@ export default function AdminPage() {
     setFormLongitude("");
     setFormImageFile(null);
     setFormExternalUrl("");
+    setFormUploader("Anonymous");
     setFormError("");
     setIsFormOpen(true);
   };
@@ -213,6 +286,7 @@ export default function AdminPage() {
     setFormLongitude(loc.longitude.toString());
     setFormImageFile(null);
     setFormExternalUrl((loc.imageUrl.startsWith("/uploads/") || loc.imageUrl.startsWith("/api/uploads/") || loc.imageUrl.startsWith("/api/locations/")) ? "" : loc.imageUrl);
+    setFormUploader(loc.uploader || "Anonymous");
     setFormError("");
     setIsFormOpen(true);
   };
@@ -241,6 +315,7 @@ export default function AdminPage() {
       formData.append("difficulty", formDifficulty);
       formData.append("latitude", formLatitude);
       formData.append("longitude", formLongitude);
+      formData.append("uploader", formUploader || "Anonymous");
       if (formImageFile) {
         // Compress image client-side to bypass payload size limits
         const compressedImage = await compressImage(formImageFile);
@@ -621,6 +696,16 @@ export default function AdminPage() {
         >
           <Inbox className="h-4 w-4" /> User Submissions ({submissions.length})
         </button>
+        <button
+          onClick={() => setActiveTab("stats")}
+          className={`flex items-center gap-1.5 px-4 py-3 text-sm font-bold border-b-2 transition-all ${
+            activeTab === "stats"
+              ? "border-blue-500 text-blue-600 dark:text-blue-400"
+              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          }`}
+        >
+          <BarChart2 className="h-4 w-4" /> Usage Statistics ({stats.length})
+        </button>
       </div>
 
       {/* TAB CONTENT: LOCATIONS CRUD */}
@@ -717,14 +802,18 @@ export default function AdminPage() {
                   </div>
 
                 {/* Info and action buttons */}
-                <div className="p-4 flex-1 flex flex-col justify-between gap-4">
-                  <div className="flex flex-col gap-1">
-                    <h3 className="font-extrabold text-base truncate" title={loc.name}>{loc.name}</h3>
-                    <p className="text-[11px] text-gray-500 font-semibold flex items-center gap-1 pl-0.5">
-                      <MapPin className="h-3 w-3 text-blue-500" />
-                      Lat: {loc.latitude.toFixed(4)}, Lng: {loc.longitude.toFixed(4)}
-                    </p>
-                  </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                      <h3 className="font-extrabold text-base truncate" title={loc.name}>{loc.name}</h3>
+                      <p className="text-[11px] text-gray-500 font-semibold flex items-center gap-1 pl-0.5">
+                        <User className="h-3 w-3 text-purple-500" />
+                        By: <span className="font-bold text-gray-700 dark:text-gray-300">{loc.uploader || "Anonymous"}</span>
+                      </p>
+                      <p className="text-[11px] text-gray-500 font-semibold flex items-center gap-1 pl-0.5">
+                        <MapPin className="h-3 w-3 text-blue-500" />
+                        Lat: {loc.latitude.toFixed(4)}, Lng: {loc.longitude.toFixed(4)}
+                      </p>
+                    </div>
 
                   <div className="flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-3">
                     <button
@@ -777,7 +866,7 @@ export default function AdminPage() {
                     <option value="" className="bg-white dark:bg-slate-950 text-gray-900 dark:text-white">-- Choose location --</option>
                     {locations.map((loc) => (
                       <option key={loc.id} value={loc.id} className="bg-white dark:bg-slate-950 text-gray-900 dark:text-white">
-                        {loc.name} ({loc.difficulty})
+                        {loc.name} ({loc.difficulty}) - By: {loc.uploader || "Anonymous"}
                       </option>
                     ))}
                   </select>
@@ -869,7 +958,11 @@ export default function AdminPage() {
                       <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400">
                         {readableDate}
                       </span>
-                      <h3 className="font-bold text-sm truncate">{item.location.name}</h3>
+                      <h3 className="font-bold text-sm truncate">{item.location?.name}</h3>
+                      <p className="text-[11px] text-gray-500 font-medium flex items-center gap-1 mt-0.5">
+                        <User className="h-3 w-3 text-purple-500" />
+                        By: <span className="font-semibold text-gray-700 dark:text-gray-300">{item.location?.uploader || "Anonymous"}</span>
+                      </p>
                     </div>
 
                     <button
@@ -1119,6 +1212,206 @@ export default function AdminPage() {
         </div>
       )}
 
+      {/* TAB CONTENT: USAGE STATISTICS */}
+      {activeTab === "stats" && (
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-1">
+            <div>
+              <h2 className="text-lg font-extrabold flex items-center gap-2">
+                <BarChart2 className="h-5 w-5 text-blue-500" /> Daily Challenge Usage Statistics
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Real-time telemetry on daily challenge completions, scores, share actions, and player device info
+              </p>
+            </div>
+
+            {stats.length > 0 && (
+              <button
+                onClick={handleClearAllStats}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-red-500 hover:bg-red-500/10 text-xs font-bold transition-all border border-red-500/20"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Clear All Stats
+              </button>
+            )}
+          </div>
+
+          {/* Metric Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-bold uppercase tracking-wider">Total Plays</span>
+                <Activity className="h-4 w-4 text-blue-500" />
+              </div>
+              <span className="text-2xl font-black">{statsSummary.totalPlays.toLocaleString()}</span>
+              <span className="text-[11px] text-gray-500">Completed daily challenges</span>
+            </div>
+
+            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-bold uppercase tracking-wider">Average Score</span>
+                <Trophy className="h-4 w-4 text-yellow-500" />
+              </div>
+              <span className="text-2xl font-black text-yellow-500">{statsSummary.avgScore.toLocaleString()} <span className="text-sm font-normal text-gray-400">/ 5,000</span></span>
+              <span className="text-[11px] text-gray-500">Campus knowledge accuracy</span>
+            </div>
+
+            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-bold uppercase tracking-wider">Share Rate</span>
+                <Share2 className="h-4 w-4 text-emerald-500" />
+              </div>
+              <span className="text-2xl font-black text-emerald-500">{statsSummary.shareRate}%</span>
+              <span className="text-[11px] text-gray-500">{statsSummary.totalShares} of {statsSummary.totalPlays} shared</span>
+            </div>
+
+            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                <span className="text-xs font-bold uppercase tracking-wider">Avg Distance Off</span>
+                <MapPin className="h-4 w-4 text-orange-500" />
+              </div>
+              <span className="text-2xl font-black text-orange-400">
+                {statsSummary.avgDistance < 1000
+                  ? `${Math.round(statsSummary.avgDistance)}m`
+                  : `${(statsSummary.avgDistance / 1000).toFixed(2)}km`}
+              </span>
+              <span className="text-[11px] text-gray-500">Average proximity error</span>
+            </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex bg-gray-100 dark:bg-slate-900 p-1 rounded-xl border border-gray-200 dark:border-white/5">
+              <button
+                onClick={() => setStatsFilter("all")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  statsFilter === "all"
+                    ? "bg-white dark:bg-slate-800 shadow text-blue-600 dark:text-blue-400"
+                    : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                All Plays ({stats.length})
+              </button>
+              <button
+                onClick={() => setStatsFilter("shared")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  statsFilter === "shared"
+                    ? "bg-white dark:bg-slate-800 shadow text-emerald-600 dark:text-emerald-400"
+                    : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                Shared ({stats.filter((s) => s.shared).length})
+              </button>
+              <button
+                onClick={() => setStatsFilter("unshared")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  statsFilter === "unshared"
+                    ? "bg-white dark:bg-slate-800 shadow text-gray-700 dark:text-gray-200"
+                    : "text-gray-500 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                }`}
+              >
+                Not Shared ({stats.filter((s) => !s.shared).length})
+              </button>
+            </div>
+          </div>
+
+          {/* Stats Data List / Table */}
+          {stats.length === 0 ? (
+            <div className="text-center py-16 glass-card rounded-2xl border border-white/5 text-gray-500 dark:text-gray-400 font-medium">
+              <BarChart2 className="h-10 w-10 text-gray-400 mx-auto mb-3 opacity-60" />
+              No daily challenge usage statistics logged yet. When players complete a daily challenge, their telemetry will appear here in real time.
+            </div>
+          ) : (
+            <div className="glass-card rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-100 dark:bg-slate-900/80 text-gray-600 dark:text-gray-400 font-extrabold uppercase tracking-wider border-b border-gray-200 dark:border-white/10">
+                    <tr>
+                      <th className="py-3.5 px-4">Completion Time</th>
+                      <th className="py-3.5 px-4">Challenge Date</th>
+                      <th className="py-3.5 px-4">Landmark</th>
+                      <th className="py-3.5 px-4">Score</th>
+                      <th className="py-3.5 px-4">Distance Off</th>
+                      <th className="py-3.5 px-4">Shared?</th>
+                      <th className="py-3.5 px-4">User Details</th>
+                      <th className="py-3.5 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                    {stats
+                      .filter((s) => {
+                        if (statsFilter === "shared") return s.shared;
+                        if (statsFilter === "unshared") return !s.shared;
+                        return true;
+                      })
+                      .map((stat) => {
+                        const dateObj = new Date(stat.completedAt);
+                        const formattedTime = isNaN(dateObj.getTime())
+                          ? stat.completedAt
+                          : dateObj.toLocaleString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            });
+
+                        return (
+                          <tr key={stat.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                            <td className="py-3.5 px-4 font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                              {formattedTime}
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
+                              {stat.date}
+                            </td>
+                            <td className="py-3.5 px-4 font-medium max-w-[150px] truncate" title={stat.locationName || "Daily Landmark"}>
+                              {stat.locationName || "Daily Landmark"}
+                            </td>
+                            <td className="py-3.5 px-4 font-black text-yellow-500 whitespace-nowrap">
+                              {stat.score.toLocaleString()} <span className="text-[10px] text-gray-400 font-normal">pts</span>
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                              {stat.distance < 1000
+                                ? `${Math.round(stat.distance)}m`
+                                : `${(stat.distance / 1000).toFixed(2)}km`}
+                            </td>
+                            <td className="py-3.5 px-4 whitespace-nowrap">
+                              {stat.shared ? (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-[11px] font-bold">
+                                  <Check className="h-3 w-3" /> Shared
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-500/10 text-gray-500 border border-gray-500/20 text-[11px] font-medium">
+                                  <X className="h-3 w-3" /> Not Shared
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 max-w-[200px]">
+                              <div className="flex flex-col gap-0.5 truncate" title={`IP: ${stat.ipAddress || "Unknown"}\nUser Agent: ${stat.userAgent || "Unknown"}`}>
+                                <span className="font-mono text-[11px] text-gray-700 dark:text-gray-300 font-semibold">{stat.ipAddress || "Unknown IP"}</span>
+                                <span className="text-[10px] text-gray-400 truncate">{stat.userAgent || "Unknown Device"}</span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                              <button
+                                onClick={() => handleDeleteStat(stat.id)}
+                                className="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-500/10 transition-colors"
+                                title="Delete Stat Record"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* CRUD MODAL FORM (ADD/EDIT LOCATION) */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
@@ -1169,6 +1462,17 @@ export default function AdminPage() {
                     <option value="medium" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Medium</option>
                     <option value="hard" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white">Hard</option>
                   </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Uploader / Photo Credit</label>
+                  <input
+                    type="text"
+                    value={formUploader}
+                    onChange={(e) => setFormUploader(e.target.value)}
+                    className="px-3.5 py-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-slate-200 dark:border-white/10 text-xs focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 outline-none transition-all text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 shadow-sm"
+                    placeholder="e.g. John Doe or Anonymous"
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

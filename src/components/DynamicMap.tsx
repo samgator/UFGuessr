@@ -18,6 +18,13 @@ const MapComponent = dynamic(() => import("./GameMap"), {
   ),
 });
 
+export interface SummaryRound {
+  guess: [number, number];
+  actualLocation: [number, number];
+  locationName?: string;
+  roundNumber?: number;
+}
+
 interface DynamicMapProps {
   onMapClick?: (lat: number, lng: number) => void;
   userGuess?: [number, number] | null;
@@ -25,6 +32,7 @@ interface DynamicMapProps {
   showResult?: boolean;
   readonly?: boolean;
   isMapFullscreen?: boolean;
+  summaryRounds?: SummaryRound[] | null;
 }
 
 export default function DynamicMap(props: DynamicMapProps) {
