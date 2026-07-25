@@ -19,7 +19,12 @@ export const metadata: Metadata = {
   title: "UFGuessr | University of Florida Campus Exploration Game",
   description: "Test your knowledge of the University of Florida campus in this GeoGuessr-inspired geographic exploration game. Guess iconic Gators landmarks!",
   icons: {
-    icon: "/icon.svg?v=2",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
