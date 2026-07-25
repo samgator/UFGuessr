@@ -187,7 +187,7 @@ export default function Home() {
                     Locked
                   </span>
                 ) : dailyCompleted ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
                     <Check className="h-3 w-3" /> Completed
                   </span>
                 ) : (
@@ -230,11 +230,7 @@ export default function Home() {
 
             <Link
               href="/game/daily"
-              className={`w-full rounded-2xl ${
-                dailyCompleted
-                  ? "bg-blue-600 hover:bg-blue-700 shadow-blue-500/20"
-                  : "bg-orange-600 hover:bg-orange-700 shadow-orange-500/25"
-              } text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transform active:scale-95 transition-all py-4 cursor-pointer`}
+              className="w-full rounded-2xl bg-orange-600 hover:bg-orange-700 shadow-orange-500/25 text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg transform active:scale-95 transition-all py-4 cursor-pointer"
             >
               {dailyCompleted ? (
                 <>
