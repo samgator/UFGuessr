@@ -190,10 +190,10 @@ export default function DailyGamePage() {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col relative min-h-[calc(100vh-65px)] overflow-hidden">
+    <div className="flex-1 w-full flex flex-col relative h-[calc(100dvh-57px)] sm:h-[calc(100dvh-65px)] max-h-[calc(100dvh-57px)] sm:max-h-[calc(100dvh-65px)] overflow-hidden">
       
       {/* 1. Full Image Showcase Area */}
-      <div className="relative bg-slate-950 flex-1 flex items-center justify-center overflow-hidden min-h-[calc(100vh-180px)]">
+      <div className="relative bg-slate-950 flex-1 min-h-0 flex items-center justify-center overflow-hidden">
         <Image
           src={location.imageUrl}
           alt="Daily Target Location"
@@ -290,17 +290,12 @@ export default function DailyGamePage() {
           {/* Top Control Bar for Fullscreen Map (Highest Z-Index & Isolated Touch Events) */}
           {isMapFullscreen ? (
             <div
-              className="fixed top-0 left-0 right-0 z-[99999] p-3 sm:p-4 bg-slate-900/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between shadow-2xl pointer-events-auto"
+              className="fixed top-0 left-0 right-0 z-[99999] p-3 sm:p-4 pt-[max(0.75rem,env(safe-area-inset-top))] bg-slate-900/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between shadow-2xl pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  setPeekPhoto(!peekPhoto);
-                }}
-                onTouchEnd={(e) => {
                   e.stopPropagation();
                   setPeekPhoto(!peekPhoto);
                 }}
@@ -313,11 +308,6 @@ export default function DailyGamePage() {
               <button
                 type="button"
                 onClick={(e) => {
-                  e.stopPropagation();
-                  e.preventDefault();
-                  setIsMapFullscreen(false);
-                }}
-                onTouchEnd={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
                   setIsMapFullscreen(false);
