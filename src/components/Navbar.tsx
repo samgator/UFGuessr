@@ -105,32 +105,8 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Header Action Buttons (Desktop & Mobile) */}
+        {/* Header Action Buttons */}
         <div className="flex justify-end items-center gap-1.5 sm:gap-2">
-          {/* GitHub & LinkedIn Links */}
-          <div className="flex items-center gap-1 sm:gap-1.5">
-            <a
-              href="https://github.com/samgator"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 sm:p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 border border-white/10 shadow-sm"
-              aria-label="GitHub Repository"
-              title="GitHub"
-            >
-              <Github className="h-4 w-4" />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/samuelmorsics"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 sm:p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 border border-white/10 shadow-sm"
-              aria-label="LinkedIn Profile"
-              title="LinkedIn"
-            >
-              <Linkedin className="h-4 w-4 text-blue-500" />
-            </a>
-          </div>
-
           {/* Desktop Buy Me A Coffee */}
           <div className="hidden md:block">
             <a
@@ -145,40 +121,30 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Desktop Settings Button */}
-          <div className="hidden md:block">
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="px-3.5 py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm cursor-pointer"
-              aria-label="Open Settings"
-            >
-              <Settings className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              <span>Settings</span>
-            </button>
-          </div>
+          {/* Settings Button */}
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className="p-2 sm:px-3.5 sm:py-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 text-xs font-bold border border-white/10 shadow-sm cursor-pointer"
+            aria-label="Open Settings"
+          >
+            <Settings className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <span className="hidden sm:inline">Settings</span>
+          </button>
 
-          {/* Mobile Actions */}
-          <div className="flex md:hidden items-center gap-1.5">
-            <button
-              onClick={() => setSettingsOpen(true)}
-              className="p-1.5 rounded-lg glass text-gray-700 dark:text-gray-300 hover:text-blue-600"
-              aria-label="Open Settings"
-            >
-              <Settings className="h-4 w-4" />
-            </button>
-
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-lg glass text-gray-700 dark:text-gray-300"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
+          {/* Three-line Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 border border-white/10 shadow-sm cursor-pointer"
+            aria-label="Toggle Menu"
+            title="Menu"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="absolute top-16 left-0 right-0 bg-white dark:bg-[#0b1329] border-b border-gray-200 dark:border-white/10 shadow-2xl flex flex-col p-4 gap-3 md:hidden z-50">
+          <div className="absolute top-16 left-0 right-0 md:left-auto md:right-8 md:w-80 bg-white dark:bg-[#0b1329] border-b md:border border-gray-200 dark:border-white/10 md:rounded-2xl shadow-2xl flex flex-col p-4 gap-3 z-50">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -217,7 +183,7 @@ export default function Navbar() {
               <span>Buy Me a Coffee</span>
             </a>
 
-            {/* Mobile Social Links */}
+            {/* Social Links */}
             <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200 dark:border-white/10">
               <a
                 href="https://github.com/samgator"
