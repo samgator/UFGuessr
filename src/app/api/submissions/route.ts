@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma, serializeLocation } from "@/lib/db";
 import { notifyNewLocationSubmission } from "@/lib/notifications";
+import { getHashedClientIp } from "@/lib/privacy";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +15,8 @@ const MAX_PENDING_QUEUE_SIZE = 50;
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. IP Rate Limiting (Prevents rapid script loops)
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("x-real-ip") || "127.0.0.1";
+    // 1. IP Rate Limiting (Prevents rapid script loops with hashed IP)
+    const clientIp = getHashedClientIp(req);
     const now = Date.now();
     const oneHourAgo = now - 60 * 60 * 1000;
 

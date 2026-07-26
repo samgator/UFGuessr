@@ -6,8 +6,8 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: "/",
-      disallow: ["/admin/", "/api/"], // Secure admin interface and internal api routes from search indexing
+      allow: ["/", "/privacy", "/terms", "/game/daily", "/game/archive"],
+      disallow: ["/admin/", "/api/"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

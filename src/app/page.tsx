@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DynamicMap from "@/components/DynamicMap";
-import { MapPin, Archive, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Github, Linkedin, Mail, Send, Copy, Check, Trophy, Eye } from "lucide-react";
+import { MapPin, Archive, Play, Calendar, HelpCircle, Award, Sparkles, Share2, UploadCloud, Plus, X, AlertTriangle, Mail, Send, Copy, Check, Trophy, Eye, ShieldCheck, FileText } from "lucide-react";
 import { compressImage } from "@/lib/imageCompression";
 
 export default function Home() {
@@ -361,26 +361,8 @@ export default function Home() {
 
       {/* Footer Branding credits & Social Links */}
       <div className="flex flex-col items-center text-center gap-4 z-10 border-t-2 border-slate-200 dark:border-white/5 w-full pt-6">
-        {/* Social Links Section */}
+        {/* Policy & Contact Links Section */}
         <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-          <a
-            href="https://github.com/samgator"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border-2 border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10 text-xs font-black text-slate-800 hover:text-slate-950 dark:text-gray-300 dark:hover:text-white transition-all duration-200 shadow-sm min-h-[44px]"
-          >
-            <Github className="h-4 w-4" />
-            <span>GitHub</span>
-          </a>
-          <a
-            href="https://www.linkedin.com/in/samuelmorsics"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border-2 border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10 text-xs font-black text-slate-800 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200 shadow-sm min-h-[44px]"
-          >
-            <Linkedin className="h-4 w-4" />
-            <span>LinkedIn</span>
-          </a>
           <button
             onClick={() => setIsContactOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border-2 border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10 text-xs font-black text-slate-800 hover:text-emerald-600 dark:text-gray-300 dark:hover:text-emerald-400 transition-all duration-200 shadow-sm cursor-pointer min-h-[44px]"
@@ -388,6 +370,20 @@ export default function Home() {
             <Mail className="h-4 w-4" />
             <span>Contact</span>
           </button>
+          <Link
+            href="/privacy"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border-2 border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10 text-xs font-black text-slate-800 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200 shadow-sm min-h-[44px]"
+          >
+            <ShieldCheck className="h-4 w-4 text-emerald-500" />
+            <span>Privacy Policy</span>
+          </Link>
+          <Link
+            href="/terms"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 border-2 border-slate-300 dark:border-white/5 hover:border-slate-400 dark:hover:border-white/10 text-xs font-black text-slate-800 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 transition-all duration-200 shadow-sm min-h-[44px]"
+          >
+            <FileText className="h-4 w-4 text-blue-500" />
+            <span>Terms of Service</span>
+          </Link>
         </div>
 
         <div className="flex flex-col items-center text-center gap-1 text-[11px] text-slate-700 dark:text-gray-400 font-extrabold uppercase tracking-widest">

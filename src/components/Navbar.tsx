@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sun, Moon, MapPin, Menu, X, Coffee, Settings, Zap, ZapOff, Check, Sliders } from "lucide-react";
+import { Sun, Moon, MapPin, Menu, X, Coffee, Settings, Zap, ZapOff, Check, Sliders, Github, Linkedin } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -106,7 +106,31 @@ export default function Navbar() {
         </div>
 
         {/* Header Action Buttons (Desktop & Mobile) */}
-        <div className="flex justify-end items-center gap-2.5">
+        <div className="flex justify-end items-center gap-1.5 sm:gap-2">
+          {/* GitHub & LinkedIn Links */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <a
+              href="https://github.com/samgator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 sm:p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 border border-white/10 shadow-sm"
+              aria-label="GitHub Repository"
+              title="GitHub"
+            >
+              <Github className="h-4 w-4" />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/samuelmorsics"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 sm:p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 border border-white/10 shadow-sm"
+              aria-label="LinkedIn Profile"
+              title="LinkedIn"
+            >
+              <Linkedin className="h-4 w-4 text-blue-500" />
+            </a>
+          </div>
+
           {/* Desktop Buy Me A Coffee */}
           <div className="hidden md:block">
             <a
@@ -134,22 +158,10 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Actions */}
-          <div className="flex md:hidden items-center gap-2">
-            {/* Mobile Buy Me A Coffee */}
-            <a
-              href="https://www.paypal.com/paypalme/samuelmorsics"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-2.5 py-1.5 rounded-lg glass text-gray-700 dark:text-gray-200 hover:text-amber-700 dark:hover:text-yellow-400 flex items-center gap-1.5 text-xs font-bold"
-              aria-label="Buy Me A Coffee"
-            >
-              <Coffee className="h-3.5 w-3.5 text-amber-600 dark:text-yellow-400" />
-              <span className="hidden xs:inline sm:inline">Buy Me a Coffee</span>
-            </a>
-
+          <div className="flex md:hidden items-center gap-1.5">
             <button
               onClick={() => setSettingsOpen(true)}
-              className="p-2 rounded-lg glass text-gray-700 dark:text-gray-300 hover:text-blue-600"
+              className="p-1.5 rounded-lg glass text-gray-700 dark:text-gray-300 hover:text-blue-600"
               aria-label="Open Settings"
             >
               <Settings className="h-4 w-4" />
@@ -204,6 +216,30 @@ export default function Navbar() {
               <Coffee className="h-4 w-4" />
               <span>Buy Me a Coffee</span>
             </a>
+
+            {/* Mobile Social Links */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200 dark:border-white/10">
+              <a
+                href="https://github.com/samgator"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-bold p-2.5 rounded-xl glass text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center gap-2 border border-white/10"
+              >
+                <Github className="h-4 w-4" />
+                <span>GitHub</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/samuelmorsics"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-xs font-bold p-2.5 rounded-xl glass text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 flex items-center justify-center gap-2 border border-white/10"
+              >
+                <Linkedin className="h-4 w-4 text-blue-500" />
+                <span>LinkedIn</span>
+              </a>
+            </div>
           </div>
         )}
       </nav>

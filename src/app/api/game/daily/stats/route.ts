@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getHashedClientIp } from "@/lib/privacy";
 
 export const dynamic = "force-dynamic";
 
@@ -12,11 +13,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required stat fields" }, { status: 400 });
     }
 
-    // Extract basic user information from headers
-    const forwardedFor = req.headers.get("x-forwarded-for");
-    const ipAddress = forwardedFor
-      ? forwardedFor.split(",")[0].trim()
-      : req.headers.get("x-real-ip") || "127.0.0.1";
+    // Extract anonymized and hashed IP for privacy compliance
+    const ipAddress = getHashedClientIp(req);
     const userAgent = req.headers.get("user-agent") || "Unknown User Agent";
 
     const stat = await prisma.dailyStat.create({
@@ -54,10 +52,7 @@ export async function PATCH(req: NextRequest) {
 
     // Fallback: if statId is missing, mark latest stat for date and client IP as shared
     if (date) {
-      const forwardedFor = req.headers.get("x-forwarded-for");
-      const ipAddress = forwardedFor
-        ? forwardedFor.split(",")[0].trim()
-        : req.headers.get("x-real-ip") || "127.0.0.1";
+      const ipAddress = getHashedClientIp(req);
 
       const latestStat = await prisma.dailyStat.findFirst({
         where: { date: String(date), ipAddress },
