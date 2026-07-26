@@ -138,12 +138,34 @@ export default function DailyGamePage() {
   const handleShare = async () => {
     if (!location) return;
     const formattedDistance = distance < 1000 ? `${Math.round(distance)}m` : `${(distance / 1000).toFixed(2)}km`;
-    const shareText = `UFGuessr Daily Challenge 🐊 (${dateStr})\n📍 Distance: ${formattedDistance} off\n🏆 Score: ${score.toLocaleString()} / 5,000 pts!\n\nCan you beat me? Play now: ${window.location.origin}/game/daily`;
+    const shareUrl = statId
+      ? `${window.location.origin}/share/daily/${statId}`
+      : `${window.location.origin}/game/daily`;
+    const shareText = `UFGuessr Daily Challenge 🐊 (${dateStr})\n📍 Distance: ${formattedDistance} off\n🏆 Score: ${score.toLocaleString()} / 5,000 pts!\n\nCan you beat my score? Play here: ${shareUrl}`;
 
-    navigator.clipboard.writeText(shareText).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    if (navigator.share) {
+      navigator
+        .share({
+          title: `UFGuessr Daily Result (${score.toLocaleString()} pts)`,
+          text: shareText,
+          url: shareUrl,
+        })
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch(() => {
+          navigator.clipboard.writeText(shareText).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          });
+        });
+    } else {
+      navigator.clipboard.writeText(shareText).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
 
     if (!hasShared) {
       setHasShared(true);
