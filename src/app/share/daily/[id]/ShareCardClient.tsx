@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Share2, Play } from "lucide-react";
+import { ArrowRight, Check, Share2, Swords } from "lucide-react";
 
 interface ShareCardClientProps {
   statId: number;
@@ -22,7 +22,7 @@ export default function ShareCardClient({ statId, score, dateStr, distanceStr }:
     if (typeof navigator !== "undefined" && navigator.share) {
       navigator
         .share({
-          title: `UFGuessr Daily Result (${score.toLocaleString()} pts)`,
+          title: `UFGuessr Daily Challenge Result (${score.toLocaleString()} pts)`,
           text: textToShare,
           url: shareUrl,
         })
@@ -41,13 +41,13 @@ export default function ShareCardClient({ statId, score, dateStr, distanceStr }:
   };
 
   return (
-    <div className="w-full flex flex-col gap-3 mt-2">
+    <div className="w-full flex flex-col gap-3 mt-1">
       <Link
         href="/game/daily"
-        className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-orange-500 hover:from-blue-500 hover:to-orange-400 text-white font-extrabold text-sm uppercase tracking-wider transition-all shadow-xl shadow-blue-500/25 flex items-center justify-center gap-2 group cursor-pointer"
+        className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-blue-600 hover:from-orange-500 hover:to-blue-500 text-white font-black text-sm uppercase tracking-wider transition-all shadow-xl shadow-orange-500/20 flex items-center justify-center gap-2.5 group cursor-pointer"
       >
-        <Play className="h-4 w-4 fill-white" />
-        <span>Play Today&apos;s Challenge</span>
+        <Swords className="h-5 w-5 text-yellow-300" />
+        <span>Accept Challenge &amp; Play Now</span>
         <ArrowRight className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
       </Link>
 
@@ -59,12 +59,12 @@ export default function ShareCardClient({ statId, score, dateStr, distanceStr }:
         {copied ? (
           <>
             <Check className="h-4 w-4 text-emerald-400" />
-            <span className="text-emerald-400">Share Link Copied!</span>
+            <span className="text-emerald-400">Challenge Link Copied!</span>
           </>
         ) : (
           <>
             <Share2 className="h-4 w-4 text-blue-400" />
-            <span>Copy / Share Challenge Link</span>
+            <span>Share Challenge Link</span>
           </>
         )}
       </button>

@@ -11,6 +11,25 @@ export const size = {
 };
 export const contentType = "image/png";
 
+// Load Inter ExtraBold & Bold fonts for crisp, exact website typography
+async function loadGoogleFont(font: string, weight: number) {
+  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}&text=UFGuessr0123456789%2C.km%20pts/DAILYCHALLENGECanyoubeatthisscore%3FOffTargetScoreEarnedDistanceLocation`;
+  const css = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    },
+  }).then((res) => res.text());
+
+  const fontUrl = css.match(/src: url\((.+?)\) format\('(?:truetype|opentype)'\)/)?.[1];
+
+  if (!fontUrl) {
+    throw new Error("Failed to parse font URL");
+  }
+
+  return fetch(fontUrl).then((res) => res.arrayBuffer());
+}
+
 export default async function Image({ params }: { params: { id: string } }) {
   const statId = parseInt(params.id, 10);
 
@@ -42,6 +61,25 @@ export default async function Image({ params }: { params: { id: string } }) {
     }
   }
 
+  // Fetch fonts safely with fallback
+  let fontData: ArrayBuffer | null = null;
+  try {
+    fontData = await loadGoogleFont("Inter", 900);
+  } catch (e) {
+    console.error("Font loading error:", e);
+  }
+
+  const fontOption = fontData
+    ? [
+        {
+          name: "Inter",
+          data: fontData,
+          style: "normal" as const,
+          weight: 900 as const,
+        },
+      ]
+    : undefined;
+
   return new ImageResponse(
     (
       <div
@@ -53,43 +91,43 @@ export default async function Image({ params }: { params: { id: string } }) {
           alignItems: "center",
           justifyContent: "space-between",
           backgroundColor: "#0b1329",
-          backgroundImage: "radial-gradient(circle at 50% 0%, #1e293b 0%, #0b1329 70%)",
-          padding: "50px 60px",
+          backgroundImage: "radial-gradient(circle at 50% -20%, #1d2846 0%, #0b1329 80%)",
+          padding: "52px 64px",
           color: "white",
-          fontFamily: "system-ui, -apple-system, sans-serif",
+          fontFamily: fontData ? "Inter, system-ui, sans-serif" : "system-ui, -apple-system, sans-serif",
           boxSizing: "border-box",
           position: "relative",
         }}
       >
-        {/* Decorative Gator-orange and blue glow accents */}
+        {/* Ambient Gator Blue & Orange Glowing Orbs */}
         <div
           style={{
             position: "absolute",
-            top: "-100px",
-            left: "-100px",
-            width: "350px",
-            height: "350px",
+            top: "-80px",
+            left: "-80px",
+            width: "400px",
+            height: "400px",
             borderRadius: "50%",
-            background: "rgba(37, 99, 235, 0.25)",
-            filter: "blur(60px)",
+            background: "rgba(37, 99, 235, 0.35)",
+            filter: "blur(70px)",
             display: "flex",
           }}
         />
         <div
           style={{
             position: "absolute",
-            bottom: "-100px",
-            right: "-100px",
-            width: "350px",
-            height: "350px",
+            bottom: "-80px",
+            right: "-80px",
+            width: "400px",
+            height: "400px",
             borderRadius: "50%",
-            background: "rgba(249, 115, 22, 0.25)",
-            filter: "blur(60px)",
+            background: "rgba(249, 115, 22, 0.35)",
+            filter: "blur(70px)",
             display: "flex",
           }}
         />
 
-        {/* Top Header: Logo & Branding */}
+        {/* Top Header: Matching Navbar Logo & Brand */}
         <div
           style={{
             display: "flex",
@@ -99,27 +137,27 @@ export default async function Image({ params }: { params: { id: string } }) {
             zIndex: 10,
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-            {/* Logo Badge */}
+          <div style={{ display: "flex", alignItems: "center", gap: "18px" }}>
+            {/* Logo Badge matching Homepage Navbar */}
             <div
               style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "16px",
-                background: "linear-gradient(135deg, #2563eb, #f97316)",
+                width: "60px",
+                height: "60px",
+                borderRadius: "18px",
+                background: "linear-gradient(135deg, #2563eb 0%, #f97316 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxShadow: "0 8px 20px rgba(37, 99, 235, 0.4)",
+                boxShadow: "0 10px 25px rgba(37, 99, 235, 0.45)",
               }}
             >
               <svg
-                width="32"
-                height="32"
+                width="34"
+                height="34"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="white"
-                strokeWidth="2.5"
+                strokeWidth="2.75"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
@@ -127,24 +165,31 @@ export default async function Image({ params }: { params: { id: string } }) {
                 <circle cx="12" cy="10" r="3" />
               </svg>
             </div>
+            
+            {/* Brand Title with Website Gradient Text */}
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span
                 style={{
-                  fontSize: "36px",
+                  fontSize: "44px",
                   fontWeight: 900,
-                  letterSpacing: "-1px",
-                  color: "#ffffff",
+                  letterSpacing: "-1.5px",
+                  background: "linear-gradient(to right, #60a5fa, #3b82f6, #fb923c)",
+                  backgroundClip: "text",
+                  WebkitBackgroundClip: "text",
+                  color: "transparent",
+                  lineHeight: 1,
                 }}
               >
                 UFGuessr
               </span>
               <span
                 style={{
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: "#38bdf8",
-                  letterSpacing: "1px",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  color: "#94a3b8",
+                  letterSpacing: "1.5px",
                   textTransform: "uppercase",
+                  marginTop: "4px",
                 }}
               >
                 UF Campus Exploration
@@ -152,23 +197,25 @@ export default async function Image({ params }: { params: { id: string } }) {
             </div>
           </div>
 
+          {/* Daily Challenge Pill */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "8px",
-              padding: "10px 20px",
+              gap: "10px",
+              padding: "12px 24px",
               borderRadius: "9999px",
-              backgroundColor: "rgba(255, 255, 255, 0.08)",
-              border: "1px solid rgba(255, 255, 255, 0.15)",
-              fontSize: "16px",
-              fontWeight: 800,
+              backgroundColor: "rgba(15, 23, 42, 0.8)",
+              border: "1.5px solid rgba(249, 115, 22, 0.4)",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+              fontSize: "17px",
+              fontWeight: 900,
               color: "#fb923c",
               letterSpacing: "0.5px",
             }}
           >
             <span>🐊 DAILY CHALLENGE</span>
-            {dateStr && <span style={{ color: "#94a3b8" }}>• {dateStr}</span>}
+            {dateStr && <span style={{ color: "#94a3b8", fontWeight: 700 }}>• {dateStr}</span>}
           </div>
         </div>
 
@@ -184,29 +231,29 @@ export default async function Image({ params }: { params: { id: string } }) {
           }}
         >
           {/* Star Rating display */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "24px" }}>
+          <div style={{ display: "flex", gap: "12px", marginBottom: "22px" }}>
             {[1, 2, 3, 4, 5].map((starIndex) => (
               <svg
                 key={starIndex}
-                width="36"
-                height="36"
+                width="38"
+                height="38"
                 viewBox="0 0 24 24"
-                fill={starIndex <= stars ? "#eab308" : "rgba(255, 255, 255, 0.1)"}
-                stroke={starIndex <= stars ? "#ca8a04" : "rgba(255, 255, 255, 0.2)"}
-                strokeWidth="1.5"
+                fill={starIndex <= stars ? "#facc15" : "rgba(255, 255, 255, 0.08)"}
+                stroke={starIndex <= stars ? "#eab308" : "rgba(255, 255, 255, 0.2)"}
+                strokeWidth="1.75"
               >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
               </svg>
             ))}
           </div>
 
-          {/* Stats Box Container */}
+          {/* Stats Box Container matching Website Cards */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "24px",
+              gap: "28px",
               width: "100%",
             }}
           >
@@ -216,22 +263,22 @@ export default async function Image({ params }: { params: { id: string } }) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "28px 48px",
-                borderRadius: "24px",
-                backgroundColor: "rgba(15, 23, 42, 0.75)",
-                border: "1.5px solid rgba(234, 179, 8, 0.3)",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-                minWidth: "320px",
+                padding: "28px 52px",
+                borderRadius: "28px",
+                backgroundColor: "rgba(15, 23, 42, 0.85)",
+                border: "2px solid rgba(234, 179, 8, 0.4)",
+                boxShadow: "0 12px 35px rgba(0, 0, 0, 0.6)",
+                minWidth: "340px",
               }}
             >
               <span
                 style={{
                   fontSize: "14px",
-                  fontWeight: 800,
+                  fontWeight: 900,
                   color: "#94a3b8",
                   textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: "6px",
+                  letterSpacing: "1.5px",
+                  marginBottom: "8px",
                 }}
               >
                 SCORE EARNED
@@ -239,16 +286,17 @@ export default async function Image({ params }: { params: { id: string } }) {
               <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
                 <span
                   style={{
-                    fontSize: "56px",
+                    fontSize: "64px",
                     fontWeight: 900,
                     color: "#facc15",
                     lineHeight: 1,
+                    letterSpacing: "-2px",
                   }}
                 >
                   {score.toLocaleString()}
                 </span>
-                <span style={{ fontSize: "20px", fontWeight: 700, color: "#64748b" }}>
-                  / 5,000 pts
+                <span style={{ fontSize: "22px", fontWeight: 800, color: "#64748b" }}>
+                  / 5,000
                 </span>
               </div>
             </div>
@@ -259,32 +307,33 @@ export default async function Image({ params }: { params: { id: string } }) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "28px 48px",
-                borderRadius: "24px",
-                backgroundColor: "rgba(15, 23, 42, 0.75)",
-                border: "1.5px solid rgba(56, 189, 248, 0.3)",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-                minWidth: "320px",
+                padding: "28px 52px",
+                borderRadius: "28px",
+                backgroundColor: "rgba(15, 23, 42, 0.85)",
+                border: "2px solid rgba(56, 189, 248, 0.4)",
+                boxShadow: "0 12px 35px rgba(0, 0, 0, 0.6)",
+                minWidth: "340px",
               }}
             >
               <span
                 style={{
                   fontSize: "14px",
-                  fontWeight: 800,
+                  fontWeight: 900,
                   color: "#94a3b8",
                   textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  marginBottom: "6px",
+                  letterSpacing: "1.5px",
+                  marginBottom: "8px",
                 }}
               >
                 DISTANCE OFF
               </span>
               <span
                 style={{
-                  fontSize: "56px",
+                  fontSize: "64px",
                   fontWeight: 900,
                   color: "#38bdf8",
                   lineHeight: 1,
+                  letterSpacing: "-2px",
                 }}
               >
                 {distanceStr}
@@ -293,32 +342,34 @@ export default async function Image({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Bottom Footer CTA */}
+        {/* Bottom Footer CTA Banner matching Homepage Buttons */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gap: "12px",
+            gap: "14px",
             width: "100%",
-            padding: "16px 32px",
-            borderRadius: "16px",
-            backgroundColor: "rgba(37, 99, 235, 0.15)",
-            border: "1px solid rgba(37, 99, 235, 0.3)",
+            padding: "18px 36px",
+            borderRadius: "20px",
+            background: "linear-gradient(to right, rgba(37, 99, 235, 0.25), rgba(249, 115, 22, 0.25))",
+            border: "1.5px solid rgba(255, 255, 255, 0.15)",
+            boxShadow: "0 8px 25px rgba(0, 0, 0, 0.4)",
             zIndex: 10,
           }}
         >
-          <span style={{ fontSize: "20px", fontWeight: 800, color: "#ffffff" }}>
+          <span style={{ fontSize: "22px", fontWeight: 900, color: "#ffffff", letterSpacing: "-0.5px" }}>
             Can you beat this score?
           </span>
-          <span style={{ fontSize: "20px", fontWeight: 800, color: "#fb923c" }}>
-            Play today&apos;s challenge at ufguessr.com
+          <span style={{ fontSize: "22px", fontWeight: 900, color: "#fb923c", letterSpacing: "-0.5px" }}>
+            Play today at ufguessr.com
           </span>
         </div>
       </div>
     ),
     {
       ...size,
+      fonts: fontOption,
     }
   );
 }
