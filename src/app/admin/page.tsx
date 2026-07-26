@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import DynamicMap from "@/components/DynamicMap";
 import { compressImage } from "@/lib/imageCompression";
+import { parseUserAgent } from "@/lib/userAgent";
 import {
   Lock,
   Plus,
@@ -28,6 +29,7 @@ import {
   Trophy,
   Share2,
   Activity,
+  Globe,
 } from "lucide-react";
 
 interface Location {
@@ -1213,70 +1215,99 @@ export default function AdminPage() {
       )}
 
       {/* TAB CONTENT: USAGE STATISTICS */}
-      {activeTab === "stats" && (
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-1">
-            <div>
-              <h2 className="text-lg font-extrabold flex items-center gap-2">
-                <BarChart2 className="h-5 w-5 text-blue-500" /> Daily Challenge Usage Statistics
-              </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                Real-time telemetry on daily challenge completions, scores, share actions, and player device info
-              </p>
-            </div>
+      {activeTab === "stats" && (() => {
+        const browserCounts = stats.reduce((acc, stat) => {
+          const parsed = parseUserAgent(stat.userAgent);
+          const name = parsed.browser.split(" ")[0];
+          acc[name] = (acc[name] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
 
-            {stats.length > 0 && (
-              <button
-                onClick={handleClearAllStats}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-red-500 hover:bg-red-500/10 text-xs font-bold transition-all border border-red-500/20"
-              >
-                <Trash2 className="h-3.5 w-3.5" /> Clear All Stats
-              </button>
-            )}
-          </div>
+        const topBrowserEntries = Object.entries(browserCounts).sort((a, b) => b[1] - a[1]);
+        const topBrowserName = topBrowserEntries.length > 0 ? topBrowserEntries[0][0] : "N/A";
+        const topBrowserPct = stats.length > 0 && topBrowserEntries.length > 0
+          ? Math.round((topBrowserEntries[0][1] / stats.length) * 100)
+          : 0;
 
-          {/* Metric Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
-              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                <span className="text-xs font-bold uppercase tracking-wider">Total Plays</span>
-                <Activity className="h-4 w-4 text-blue-500" />
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pl-1">
+              <div>
+                <h2 className="text-lg font-extrabold flex items-center gap-2">
+                  <BarChart2 className="h-5 w-5 text-blue-500" /> Daily Challenge Usage Statistics
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Real-time telemetry on daily challenge completions, scores, share actions, and player device info
+                </p>
               </div>
-              <span className="text-2xl font-black">{statsSummary.totalPlays.toLocaleString()}</span>
-              <span className="text-[11px] text-gray-500">Completed daily challenges</span>
+
+              {stats.length > 0 && (
+                <button
+                  onClick={handleClearAllStats}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-red-500 hover:bg-red-500/10 text-xs font-bold transition-all border border-red-500/20"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Clear All Stats
+                </button>
+              )}
             </div>
 
-            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
-              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                <span className="text-xs font-bold uppercase tracking-wider">Average Score</span>
-                <Trophy className="h-4 w-4 text-yellow-500" />
+            {/* Metric Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+                <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold uppercase tracking-wider">Total Plays</span>
+                  <Activity className="h-4 w-4 text-blue-500" />
+                </div>
+                <span className="text-2xl font-black">{statsSummary.totalPlays.toLocaleString()}</span>
+                <span className="text-[11px] text-gray-500">Completed daily challenges</span>
               </div>
-              <span className="text-2xl font-black text-yellow-500">{statsSummary.avgScore.toLocaleString()} <span className="text-sm font-normal text-gray-400">/ 5,000</span></span>
-              <span className="text-[11px] text-gray-500">Campus knowledge accuracy</span>
-            </div>
 
-            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
-              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                <span className="text-xs font-bold uppercase tracking-wider">Share Rate</span>
-                <Share2 className="h-4 w-4 text-emerald-500" />
+              <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+                <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold uppercase tracking-wider">Average Score</span>
+                  <Trophy className="h-4 w-4 text-yellow-500" />
+                </div>
+                <span className="text-2xl font-black text-yellow-500">{statsSummary.avgScore.toLocaleString()} <span className="text-sm font-normal text-gray-400">/ 5,000</span></span>
+                <span className="text-[11px] text-gray-500">Campus knowledge accuracy</span>
               </div>
-              <span className="text-2xl font-black text-emerald-500">{statsSummary.shareRate}%</span>
-              <span className="text-[11px] text-gray-500">{statsSummary.totalShares} of {statsSummary.totalPlays} shared</span>
-            </div>
 
-            <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
-              <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                <span className="text-xs font-bold uppercase tracking-wider">Avg Distance Off</span>
-                <MapPin className="h-4 w-4 text-orange-500" />
+              <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+                <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold uppercase tracking-wider">Share Rate</span>
+                  <Share2 className="h-4 w-4 text-emerald-500" />
+                </div>
+                <span className="text-2xl font-black text-emerald-500">{statsSummary.shareRate}%</span>
+                <span className="text-[11px] text-gray-500">{statsSummary.totalShares} of {statsSummary.totalPlays} shared</span>
               </div>
-              <span className="text-2xl font-black text-orange-400">
-                {statsSummary.avgDistance < 1000
-                  ? `${Math.round(statsSummary.avgDistance)}m`
-                  : `${(statsSummary.avgDistance / 1000).toFixed(2)}km`}
-              </span>
-              <span className="text-[11px] text-gray-500">Average proximity error</span>
+
+              <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+                <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold uppercase tracking-wider">Avg Distance Off</span>
+                  <MapPin className="h-4 w-4 text-orange-500" />
+                </div>
+                <span className="text-2xl font-black text-orange-400">
+                  {statsSummary.avgDistance < 1000
+                    ? `${Math.round(statsSummary.avgDistance)}m`
+                    : `${(statsSummary.avgDistance / 1000).toFixed(2)}km`}
+                </span>
+                <span className="text-[11px] text-gray-500">Average proximity error</span>
+              </div>
+
+              <div className="glass-card p-4 rounded-2xl border border-white/10 flex flex-col gap-1 shadow-md">
+                <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                  <span className="text-xs font-bold uppercase tracking-wider">Top Browser</span>
+                  <Globe className="h-4 w-4 text-cyan-500" />
+                </div>
+                <span className="text-2xl font-black text-cyan-400 truncate">
+                  {topBrowserName} <span className="text-sm font-normal text-gray-400">({topBrowserPct}%)</span>
+                </span>
+                <span className="text-[11px] text-gray-500">
+                  {topBrowserEntries.length > 1
+                    ? `${topBrowserEntries.length} different browsers logged`
+                    : "Most used player browser"}
+                </span>
+              </div>
             </div>
-          </div>
 
           {/* Filter Bar */}
           <div className="flex items-center justify-between gap-4">
@@ -1355,6 +1386,7 @@ export default function AdminPage() {
                               minute: "2-digit",
                               hour12: true,
                             });
+                        const ua = parseUserAgent(stat.userAgent);
 
                         return (
                           <tr key={stat.id} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
@@ -1387,9 +1419,9 @@ export default function AdminPage() {
                               )}
                             </td>
                             <td className="py-3.5 px-4 max-w-[200px]">
-                              <div className="flex flex-col gap-0.5 truncate" title={`IP: ${stat.ipAddress || "Unknown"}\nUser Agent: ${stat.userAgent || "Unknown"}`}>
+                              <div className="flex flex-col gap-0.5 truncate" title={`IP: ${stat.ipAddress || "Unknown"}\nDevice: ${ua.formatted}\nUser Agent: ${stat.userAgent || "Unknown"}`}>
                                 <span className="font-mono text-[11px] text-gray-700 dark:text-gray-300 font-semibold">{stat.ipAddress || "Unknown IP"}</span>
-                                <span className="text-[10px] text-gray-400 truncate">{stat.userAgent || "Unknown Device"}</span>
+                                <span className="text-[10px] text-gray-400 truncate" title={ua.formatted}>{ua.formatted}</span>
                               </div>
                             </td>
                             <td className="py-3.5 px-4 text-right whitespace-nowrap">
@@ -1410,7 +1442,8 @@ export default function AdminPage() {
             </div>
           )}
         </div>
-      )}
+      );
+    })()}
 
       {/* CRUD MODAL FORM (ADD/EDIT LOCATION) */}
       {isFormOpen && (
