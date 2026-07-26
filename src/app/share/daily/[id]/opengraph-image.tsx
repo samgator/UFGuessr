@@ -17,7 +17,6 @@ export default async function Image({ params }: { params: { id: string } }) {
   let score = 0;
   let distanceStr = "0m";
   let dateStr = "";
-  let locationName = "";
   let stars = 5;
 
   if (!isNaN(statId)) {
@@ -31,7 +30,6 @@ export default async function Image({ params }: { params: { id: string } }) {
         const dist = stat.distance;
         distanceStr = dist < 1000 ? `${Math.round(dist)}m` : `${(dist / 1000).toFixed(2)}km`;
         dateStr = stat.date;
-        if (stat.locationName) locationName = stat.locationName;
 
         if (score >= 4800) stars = 5;
         else if (score >= 4000) stars = 4;
@@ -186,7 +184,7 @@ export default async function Image({ params }: { params: { id: string } }) {
           }}
         >
           {/* Star Rating display */}
-          <div style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "24px" }}>
             {[1, 2, 3, 4, 5].map((starIndex) => (
               <svg
                 key={starIndex}
@@ -218,7 +216,7 @@ export default async function Image({ params }: { params: { id: string } }) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "24px 44px",
+                padding: "28px 48px",
                 borderRadius: "24px",
                 backgroundColor: "rgba(15, 23, 42, 0.75)",
                 border: "1.5px solid rgba(234, 179, 8, 0.3)",
@@ -261,7 +259,7 @@ export default async function Image({ params }: { params: { id: string } }) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                padding: "24px 44px",
+                padding: "28px 48px",
                 borderRadius: "24px",
                 backgroundColor: "rgba(15, 23, 42, 0.75)",
                 border: "1.5px solid rgba(56, 189, 248, 0.3)",
@@ -293,19 +291,6 @@ export default async function Image({ params }: { params: { id: string } }) {
               </span>
             </div>
           </div>
-
-          {locationName && (
-            <p
-              style={{
-                fontSize: "18px",
-                fontWeight: 600,
-                color: "#cbd5e1",
-                marginTop: "18px",
-              }}
-            >
-              Location: <span style={{ color: "#ffffff", fontWeight: 700 }}>{locationName}</span>
-            </p>
-          )}
         </div>
 
         {/* Bottom Footer CTA */}

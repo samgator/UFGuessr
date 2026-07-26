@@ -145,12 +145,6 @@ export default async function SharePage({ params }: SharePageProps) {
           </div>
         </div>
 
-        {stat.locationName && (
-          <p className="text-xs sm:text-sm text-gray-300 font-medium bg-slate-800/40 px-4 py-2 rounded-xl border border-white/5 w-full truncate">
-            📍 Landmark: <span className="font-bold text-white">{stat.locationName}</span>
-          </p>
-        )}
-
         {/* Interactive Actions */}
         <ShareCardClient statId={stat.id} score={score} dateStr={stat.date} distanceStr={formattedDistance} />
       </div>
