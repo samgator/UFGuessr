@@ -130,6 +130,16 @@ export default function Navbar() {
             <span className="hidden sm:inline">Settings</span>
           </button>
 
+          {/* Mobile Yellow Coffee Icon Button */}
+          <button
+            onClick={() => setCoffeeOpen(true)}
+            className="md:hidden p-2 rounded-xl glass hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-all duration-200 text-amber-500 dark:text-yellow-400 hover:text-amber-600 dark:hover:text-yellow-300 flex items-center justify-center border border-white/10 shadow-sm cursor-pointer"
+            aria-label="Buy Me A Coffee"
+            title="Buy Me a Coffee"
+          >
+            <Coffee className="h-4 w-4 text-amber-500 dark:text-yellow-400" />
+          </button>
+
           {/* Three-line Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
