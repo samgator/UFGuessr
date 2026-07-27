@@ -335,7 +335,6 @@ export default function Navbar() {
                 </div>
                 <div>
                   <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Buy Me a Coffee</h2>
-                  <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">Choose your preferred payment method</p>
                 </div>
               </div>
               <button
